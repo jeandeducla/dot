@@ -1,0 +1,50 @@
+! xterm configuration
+
+! theme from https://github.com/LeonGr/urxvt-snazzy
+*background:   [97]#282a36
+*foreground:   #eff0eb
+
+*color0:      #33303b
+*color8:      #4f4b58
+*color1:      #ff5c57
+*color9:      #ff5c57
+*color2:      #5af78e
+*color10:     #5af78e
+*color3:      #f3f99d
+*color11:     #f3f99d
+*color4:      #57c7ff
+*color12:     #57c7ff
+*color5:      #ff6ac1
+*color13:     #ff6ac1
+*color6:      #9aedfe
+*color14:     #9aedfe
+*color7:      #eff0eb
+*color15:     #eff0eb
+
+URxvt.scrollBar:   false
+URxvt.font:        xft:monospace:size=11
+URxvt.cursorColor: magenta
+URxvt.transparent: true
+URxvt.shading:     20
+
+! Extensions
+URxvt.perl-ext-common: default,matcher,resize-font,keyboard-select,url-select
+URxvt.colorUL: #4682B4 
+! matcher
+URxvt.url-launcher:   /usr/bin/firefox
+URxvt.matcher.button: 1
+! url-select mapping
+URxvt.keysym.M-u:           perl:url-select:select_next
+URxvt.url-select.launcher:  /usr/bin/firefox
+URxvt.url-select.underline: true
+! keyboard-select mapping
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
+! resize-font
+URxvt.resize-font.smaller: C-j
+URxvt.resize-font.bigger:  C-k
+
+! Ctrl+arrows key bindings for fast word
+URxvt.keysym.Control-Up:    \033[1;5A
+URxvt.keysym.Control-Down:  \033[1;5B
+URxvt.keysym.Control-Left:  \033[1;5D
+URxvt.keysym.Control-Right: \033[1;5C
