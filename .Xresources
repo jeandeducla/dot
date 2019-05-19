@@ -1,31 +1,32 @@
 ! xterm configuration
 
-! theme from https://github.com/LeonGr/urxvt-snazzy
-*background:   [97]#282a36
-*foreground:   #eff0eb
+! from https://github.com/seenaburns/dotfiles/blob/master/.config/alacritty/alacritty.yml
+! apparently inspired from https://github.com/ChrisKempson/Tomorrow-Theme
+*background: #1D1C27
+*foreground: #C8D1E3
+*color0:  #686B82
+*color1:  #FF3E57
+*color2:  #00FA8E
+*color3:  #E5D781
+*color4:  #18A2FF
+*color5:  #CE63EC
+*color6:  #47E3DD
+*color7:  #C8D1E3
+*color8:  #2B2A3B
+*color9:  #FF3E57
+*color10: #00FA8E
+*color11: #E5D781
+*color12: #18A2FF
+*color13: #CE63EC
+*color14: #47E3DD
+*color15: #EDEFF2
 
-*color0:      #33303b
-*color8:      #4f4b58
-*color1:      #ff5c57
-*color9:      #ff5c57
-*color2:      #5af78e
-*color10:     #5af78e
-*color3:      #f3f99d
-*color11:     #f3f99d
-*color4:      #57c7ff
-*color12:     #57c7ff
-*color5:      #ff6ac1
-*color13:     #ff6ac1
-*color6:      #9aedfe
-*color14:     #9aedfe
-*color7:      #eff0eb
-*color15:     #eff0eb
 
 URxvt.scrollBar:   false
 URxvt.font:        xft:monospace:size=11
 URxvt.cursorColor: magenta
 URxvt.transparent: true
-URxvt.shading:     20
+URxvt.shading:     10
 
 ! Extensions
 URxvt.perl-ext-common: default,matcher,resize-font,keyboard-select,url-select
