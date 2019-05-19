@@ -1,93 +1,120 @@
 " Vim configuration file
-" TODO: autocompletion
 " TODO: status bar, file name, git branch, mode, lsp server on...
-" TODO: make a grep shortcut
+" TODO: install ag as grep command and make a 'usefull' shortcut to re-edit
+" search term under cursor and just when you need to search for something
+" TODO: NEOMAKE
 
-" TODO: check that 
-set t_Co=256
-syntax enable
-" colorscheme darcula
-
-" PATHOGEN
 execute pathogen#infect()
 
-" TODO: check that too
+
+" ------ BEAUTY ------ "
+
+set t_Co=16
 filetype plugin indent on
-" syntax on
+" syntax hightlight
+if !exists("g:syntax_on")
+    syntax enable
+endif
 
-" GO-VIM
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_interfaces = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_fields = 1
+" color scheme
+set background=dark
+colorscheme nnkd
+
+" split char
+set fillchars=vert:│
+
+" special highlightings
+" json syntax highlight
+autocmd BufNewFile,BufRead *.json* set ft=javascript
+" avro syntax highlight
+autocmd BufNewFile,BufRead *.avsc set ft=javascript
 
 
-" RUST
-set hidden
+" ------ PLUGGINS ------ "
+
+" syntastic: syntax checker
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 3
+let g:syntastic_enable_highlighting = 1
+
+" TODO: install it
+" go-vim
+" let g:go_highlight_functions = 1
+" let g:go_highlight_methods = 1
+" let g:go_highlight_structs = 1
+" let g:go_highlight_interfaces = 1
+" let g:go_highlight_operators = 1
+" let g:go_highlight_build_constraints = 1
+" let g:go_highlight_extra_types = 1
+" let g:go_highlight_function_calls = 1
+" let g:go_highlight_fields = 1
+
+" vim-racer: uses Racer for Rust code complettion and navigation
+set hidden 
 let g:racer_cmd = "/home/auntidjin/.cargo/bin/racer"
 
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>gd <Plug>(rust-doc)
-
-
-" OPTIONS
-" search down into subfolders
-" Provides tab-completion for all file-related tasks
-set path+=**
-
-" highlight cursor's line
-set cursorline 
-
-" Display all matching files when we tab complete
-set wildmenu
-
-" ctrlp.vim fuzzy file, buffer, mru, tag, etc... finder
-" Don't understand why you have to add that to the runtimepath thoug
+" ctrlp.vim: full path fuzzy finder
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
-" set line numers on
+" NERDTree: file system explorer
+" NERDTree opens when vim opens
+autocmd vimenter * NERDTree
+" NERDTree arrows
+let g:NERDTreeDirArrowExpandable = '▶'
+let g:NERDTreeDirArrowCollapsible = '▼'
+
+
+" ------ OPTIONS ------ "
+
+" searches down into subfolders
+" provides tab-completion for all file-related tasks
+set path+=**
+" displays all matching files when we tab complete
+set wildmenu
+
+" highlights cursor's line
+set cursorline 
+
+" sets line numbers on and relative numbers
 set number relativenumber
 
 " highlights matching braces
 set showmatch
+
 " intelligent comments
 set comments=sl:/*,mb:\ *,elx:\ */
-"
-" use indentation of previous line
-set autoindent
-" use smart indentation for C
-set smartindent
-" configure tabwidth and insert spaces instead of tabs
+ 
+" uses indentation of previous line and smartindent (indent after {...)
+set autoindent smartindent
+" configures tabwidth and insert spaces instead of tabs
 set tabstop=4    " tab width is 4 spaces
 set shiftwidth=4 " indent with 4 spaces
 set expandtab    " expand tab to spaces
 
-" Set the command window height to 2 lines, to avoid many cases of having to
+" sets the command window height to 2 lines, to avoid many cases of having to
 " "press <Enter> to continue"
 set cmdheight=2
 
-" Always display the status line, even if only one window is displayeds<Left>
-" install python-languageet-server
-"
-set laststatus=2
- 
-" highlights search result
-set hlsearch
-set incsearch
+" highlights search result and enableds incremental results
+set hlsearch incsearch
 
-" automatically read a file if it has been changed
+" automatically reads a file if it has been changed
 set autoread
 
+" splits open at the bottom or on the right
+set splitbelow splitright
+set noequalalways
 
-" LSP SERVERS
-" go
+
+" ------ STATUS LINE ------ "
+
+" always displays the status line, even if only one window is displayed
+set laststatus=2
+ 
+
+" ------ LSP SERVERS ------ "
+
+" " go
 " if executable('go-langserver')
 "     au User lsp_setup call lsp#register_server({
 "         \ 'name': 'go-langserver',
@@ -142,29 +169,10 @@ set autoread
 
 " flow
 
-" SPECIAL FILES
-" json syntax highlight
-autocmd BufNewFile,BufRead *.json* set ft=javascript
-" avro syntax highlight
-autocmd BufNewFile,BufRead *.avsc set ft=javascript
 
+" ------ KEY MAPPINGS ------ "
 
-" Splits open at the bottom or on the right
-set splitbelow splitright
-set noequalalways
-
-" NERDTree for browsing, opens when vim opens
-" autocmd vimenter * NERDTree
-
-" unicode arrows dont render, possible solutions:
-" https://github.com/scrooloose/nerdtree/issues/108 
-" with this one we dont render the arrows
-let g:NERDTreeDirArrowExpandable = '>'
-let g:NERDTreeDirArrowCollapsible = '~'
-
-
-" KEY MAPPINGS
-" window movement mapping
+" window movement 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -186,20 +194,30 @@ nnoremap <S-Right> <C-w><
 " uses <space> as leader
 let g:mapleader = "\<space>"
  
-" fugitive key bindings
+" fugitive
 nnoremap <leader>gd :Gdiff<CR>
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gl :Gpull<CR>
 nnoremap <leader>gp :Gpush<CR>
 
+" NERDTree
 " toggles NERDTree
 nnoremap <silent> <leader>ls :NERDTreeToggle<CR> :set equalalways<CR>
+" replaces default NERDTree vsplit and hslpit to match CtrlP mappings
+let NERDTreeMapOpenSplit='<C-H>'
+let NERDTreeMapOpenVSplit='<C-V>'
 
+" TODO: I don't remember this thing
+" opens quick fix window result in a horizontal split
+autocmd! FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L                                                                                                                                             
+
+" custom helper toggles
 " toggles number and relativenumber
 nnoremap <silent> <leader>N :setlocal number! relativenumber!<CR>
-
-" Press Space to turn off highlighting and clear any message already displayed.
+" press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
+" press <space> w to toggle line wrapping
+nnoremap <leader>w :set wrap!<CR>
 
 " LSP
 nnoremap <silent> <A-d> :LspDefinition<CR>
@@ -209,11 +227,18 @@ nnoremap <silent> <A-a> :LspWorkspaceSymbol<CR>
 nnoremap <silent> <A-l> :LspDocumentSymbol<CR>
 nnoremap <silent> <A-x> :LspDocumentDiagnostics<CR>
 
-" Hack to remap Alt key escaped by gnome terminal
-let c='a'
-while c <= 'z'
-  exec "set <A-".c.">=\e".c
-  exec "imap \e".c." <A-".c.">"
-  let c = nr2char(1+char2nr(c))
-endwhile
-set timeout ttimeoutlen=50
+" vim-racer 
+au FileType rust nmap gd <Plug>(rust-def)
+au FileType rust nmap gs <Plug>(rust-def-split)
+au FileType rust nmap gx <Plug>(rust-def-vertical)
+au FileType rust nmap <leader>rd <Plug>(rust-doc)
+
+
+" hack to remap Alt key escaped by gnome terminal
+" let c='a'
+" while c <= 'z'
+"   exec "set <A-".c.">=\e".c
+"   exec "imap \e".c." <A-".c.">"
+"   let c = nr2char(1+char2nr(c))
+" endwhile
+" set timeout ttimeoutlen=50
