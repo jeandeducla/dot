@@ -17,6 +17,18 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec urxvt
 
+# launcher mode, so far only firefox
+set $mode_launcher Launch: [f]irefox
+bindsym $mod+o mode "$mode_launcher"
+
+mode "$mode_launcher" {
+    bindsym f exec firefox
+
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+    bindsym $mod+o mode "default"
+}
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
