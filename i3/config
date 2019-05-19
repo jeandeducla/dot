@@ -154,6 +154,14 @@ bindsym $mod+r mode "resize"
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 # i3 gaps
-for_window [class=".*"] border pixel 0
-gaps inner 5
-gaps outer 5
+for_window [class=".*"] border pixel 2
+gaps inner 3
+gaps outer 3
+
+# beauty
+# class                 border  backgr. text    indicator child_border
+client.focused          #00FA8E #00FA8E #1d1c27 #00FA8E   #00FA8E
+client.focused_inactive #222222 #222222 #edefc9 #00FA8E   #333333
+client.unfocused        #222222 #222222 #edefc9 #222222   #222222
+client.urgent           #2f343a #900000 #ffffff #900000   #900000
+client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
