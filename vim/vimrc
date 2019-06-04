@@ -49,7 +49,7 @@ let g:syntastic_enable_highlighting = 1
 " let g:go_highlight_function_calls = 1
 " let g:go_highlight_fields = 1
 
-" vim-racer: uses Racer for Rust code complettion and navigation
+" vim-racer: uses Racer for Rust code completion and navigation
 set hidden 
 let g:racer_cmd = "/home/auntidjin/.cargo/bin/racer"
 
@@ -104,6 +104,9 @@ set autoread
 " splits open at the bottom or on the right
 set splitbelow splitright
 set noequalalways
+
+" most of my mapping are just 2 keys so you can type pretty fast
+set timeoutlen=200
 
 
 " ------ STATUS LINE ------ "
@@ -213,7 +216,7 @@ autocmd! FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
 
 " custom helper toggles
 " toggles number and relativenumber
-nnoremap <silent> <leader>N :setlocal number! relativenumber!<CR>
+nnoremap <silent> <leader>n :setlocal number! relativenumber!<CR>
 " press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
 " press <space> w to toggle line wrapping
@@ -232,13 +235,3 @@ au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
 au FileType rust nmap <leader>rd <Plug>(rust-doc)
-
-
-" hack to remap Alt key escaped by gnome terminal
-" let c='a'
-" while c <= 'z'
-"   exec "set <A-".c.">=\e".c
-"   exec "imap \e".c." <A-".c.">"
-"   let c = nr2char(1+char2nr(c))
-" endwhile
-" set timeout ttimeoutlen=50
