@@ -68,6 +68,17 @@ let g:NERDTreeDirArrowCollapsible = '▼'
 " TODO: pimp neomake, like having a key mapping to build the project/file, for
 " now just use Neomake cargo or NeomakeProject cargo
 
+" The Silver Searcher
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+endif
 
 " ------ OPTIONS ------ "
 
@@ -113,6 +124,8 @@ set noequalalways
 " most of my mapping are just 2 keys so you can type pretty fast
 set timeoutlen=200
 
+" custom grep command that opens result in quickfix window
+command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 
 " ------ STATUS LINE ------ "
 
@@ -218,6 +231,9 @@ let NERDTreeMapOpenVSplit='<C-V>'
 " TODO: I don't remember this thing
 " opens quick fix window result in a horizontal split
 autocmd! FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L                                                                                                                                             
+" press <space> r to grep word under cursor
+" (trick to get the grep query added to cmd history to edit query if need be)
+nnoremap <leader>r :let cmd="Ag " . expand('<cword>') <bar> call histadd("cmd", cmd) <bar> execute cmd<CR>
 
 " custom helper toggles
 " toggles number and relativenumber
