@@ -63,6 +63,11 @@ autocmd vimenter * NERDTree
 let g:NERDTreeDirArrowExpandable = '▶'
 let g:NERDTreeDirArrowCollapsible = '▼'
 
+" neomake
+" autocmd! BufWritePost *.rs NeomakeProject cargo
+" TODO: pimp neomake, like having a key mapping to build the project/file, for
+" now just use Neomake cargo or NeomakeProject cargo
+
 
 " ------ OPTIONS ------ "
 
