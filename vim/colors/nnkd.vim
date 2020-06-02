@@ -66,7 +66,7 @@ hi Todo cterm=none ctermbg=none ctermfg=yellow
 "
 hi Keyword cterm=bold ctermbg=none ctermfg=green
 
-hi Visual cterm=none ctermbg=0 ctermfg=8
+hi Visual cterm=none ctermbg=8 ctermfg=none
 
 hi MatchParen   cterm=none ctermbg=none ctermfg=blue
 
@@ -75,7 +75,7 @@ hi Pmenu        cterm=none ctermbg=8 ctermfg=white
 hi PmenuSel     cterm=none ctermbg=white ctermfg=8
 
 hi CursorLine   cterm=none ctermbg=8 ctermfg=none
-hi CursorLineNr cterm=none ctermbg=none ctermfg=blue
+hi CursorLineNr cterm=bold ctermbg=none ctermfg=blue
 
 hi LineNr       cterm=none ctermbg=none ctermfg=black
 
@@ -85,13 +85,18 @@ hi colorcolumn  cterm=none ctermbg=8 ctermfg=none
 hi Folded       cterm=none ctermbg=none ctermfg=white
 hi TabLine      cterm=none ctermbg=none ctermfg=grey
 
-hi Search       cterm=none ctermbg=red ctermfg=8
-hi IncSearch    cterm=none ctermbg=red ctermfg=8
+hi Search       cterm=bold ctermbg=magenta ctermfg=white
+hi IncSearch    cterm=bold ctermbg=magenta ctermfg=white
 
 hi QuickFixLine cterm=none ctermbg=black ctermfg=white
 
 " Split between panes
-hi VertSplit    cterm=none ctermbg=none ctermfg=black
+" hi VertSplit    cterm=none ctermbg=none ctermfg=black
+hi VertSplit    cterm=bold ctermbg=none ctermfg=8
+
+" Status bar
+hi StatusLine     cterm=bold ctermbg=8 ctermfg=white
+hi StatusLineNC   cterm=none ctermbg=8 ctermfg=0
 
 " Markdown
 hi link markdownH1 Special
@@ -109,10 +114,10 @@ hi SignColumn cterm=none ctermbg=none ctermfg=white
 " Quickfix
 hi link qfFileName Identifier
 
-hi DiffAdd    cterm=bold ctermfg=black ctermbg=green
-hi DiffDelete cterm=NONE ctermfg=black ctermbg=red
-hi DiffChange cterm=NONE ctermfg=black ctermbg=green
-hi DiffText   cterm=bold ctermfg=black ctermbg=green
+hi DiffAdd    cterm=none ctermfg=green ctermbg=8
+hi DiffDelete cterm=none ctermfg=red   ctermbg=8
+hi DiffChange cterm=none ctermfg=green ctermbg=8
+hi DiffText   cterm=none ctermfg=green ctermbg=8
 
 " Language specific
 hi GoString cterm=none ctermbg=none ctermfg=blue
@@ -126,3 +131,10 @@ hi vimParenSep  cterm=none ctermbg=none ctermfg=white
 hi vimVar       cterm=none ctermbg=none ctermfg=white 
 hi vimFuncName  cterm=none ctermbg=none ctermfg=yellow 
 hi vimIsCommand cterm=none ctermbg=none ctermfg=yellow 
+
+
+" LSP 
+hi LspErrorText cterm=bold ctermbg=none ctermfg=red 
+hi LspErrorLine cterm=bold ctermbg=none ctermfg=red 
+hi LspWarningText cterm=bold ctermbg=none ctermfg=yellow 
+hi LspInformationText cterm=bold ctermbg=none ctermfg=white 

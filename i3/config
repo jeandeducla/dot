@@ -3,13 +3,14 @@
 #
 
 # wallpaper
-exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpapers/*
+# TODO
+# exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpapers/*
 
 # window key as mod
 set $mod Mod4
 
 # font
-font xft:monospace 9
+font xft:monospace Bold 12
 
 # use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -18,11 +19,13 @@ floating_modifier $mod
 bindsym $mod+Return exec urxvt
 
 # launcher mode, so far only firefox
-set $mode_launcher Launch: [f]irefox
+set $mode_launcher Launch: [f]irefox [c]hromium [i]dea
 bindsym $mod+o mode "$mode_launcher"
 
 mode "$mode_launcher" {
     bindsym f exec firefox
+    bindsym c exec chromium
+    bindsym i exec idea
 
     bindsym Escape mode "default"
     bindsym Return mode "default"
@@ -33,7 +36,9 @@ mode "$mode_launcher" {
 bindsym $mod+Shift+q kill
 
 # start dmenu
-bindsym $mod+d exec dmenu_run
+bindsym $mod+d exec dmenu_run -fn "xft:monospace Bold 13" -nb "#1D1C27" -sb "#CE63EC"
+
+bindsym $mod+p exec "i3lock -e -f -c 404040"
 
 # change focus
 bindsym $mod+j focus left
@@ -71,6 +76,9 @@ bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
+# default workspace layout is tabbed
+workspace_layout tabbed
+
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
 
@@ -81,7 +89,7 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
 
 # focus the child container
-# bindsym $mod+d focus child
+bindsym $mod+z focus child
 
 # workspaces
 set $ws1 "1"
@@ -151,17 +159,33 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 # polybar
-exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+# TODO
+# exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+bar {
+        font xft:monospace Bold 13
+        status_command i3status
+
+        colors {
+            background #1D1C27
+
+            focused_workspace  #CE63EC #CE63EC #ffffff
+            active_workspace   #333333 #5f676a #ffffffV
+            inactive_workspace #1D1C27 #1D1C27 #888888
+            urgent_workspace   #FF3E57 #FF3E57 #ffffff
+            binding_mode       #FF3E57 #FF3E57 #ffffffV
+        }
+}
 
 # i3 gaps
-for_window [class=".*"] border pixel 2
-gaps inner 3
-gaps outer 3
+# TODO
+# for_window [class=".*"] border pixel 2
+# gaps inner 3
+# gaps outer 3
 
 # beauty
 # class                 border  backgr. text    indicator child_border
 client.focused          #00FA8E #00FA8E #1d1c27 #00FA8E   #00FA8E
-client.focused_inactive #222222 #222222 #edefc9 #00FA8E   #333333
-client.unfocused        #222222 #222222 #edefc9 #222222   #222222
-client.urgent           #2f343a #900000 #ffffff #900000   #900000
+client.focused_inactive #1D1C27 #1D1C27 #00FA8E #00FA8E   #1D1C27
+client.unfocused        #1D1C27 #1D1C27 #00FA8E #222222   #1D1C27
+client.urgent           #FF3E57 #FF3E57 #ffffff #900000   #900000
 client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c

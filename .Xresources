@@ -21,28 +21,27 @@
 *color14: #47E3DD
 *color15: #EDEFF2
 
-
 URxvt.scrollBar:   false
-URxvt.font:        xft:monospace:size=11
+URxvt.font:        xft:noto sans mono:size=15
 URxvt.cursorColor: magenta
 URxvt.transparent: true
 URxvt.shading:     10
 
 ! Extensions
-URxvt.perl-ext-common: default,matcher,resize-font,keyboard-select,url-select
+URxvt.perl-ext-common: default,resize-font,keyboard-select,url-select,clipboard
 URxvt.colorUL: #4682B4 
-! matcher
-URxvt.url-launcher:   /usr/bin/firefox
-URxvt.matcher.button: 1
-! url-select mapping
+
+! clipboard
+URxvt.clipboard.autocopy: true
+URxvt.keysym.M-c: perl:clipboard:copy
+URxvt.keysym.M-v: perl:clipboard:paste
+! url select
 URxvt.keysym.M-u:           perl:url-select:select_next
 URxvt.url-select.launcher:  /usr/bin/firefox
 URxvt.url-select.underline: true
 ! keyboard-select mapping
 URxvt.keysym.M-Escape: perl:keyboard-select:activate
-! resize-font
-URxvt.resize-font.smaller: C-j
-URxvt.resize-font.bigger:  C-k
+URxvt.keyboard-select.clipboard: true
 
 ! Ctrl+arrows key bindings for fast word
 URxvt.keysym.Control-Up:    \033[1;5A

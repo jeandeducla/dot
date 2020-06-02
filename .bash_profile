@@ -1,8 +1,9 @@
 # bash profile
-source ~/.bashrc
+# source ~/.bashrc
 
 # aliases
 alias ll="ls -alh --color"
+alias vi="vim"
 
 # git aliases
 alias gs="git status"
@@ -16,21 +17,34 @@ alias gd="git diff"
 
 # env variable
 export CDPATH=~/works/
+
+# rust
 export PATH="$PATH:$HOME/.cargo/bin"
-export PATH="$HOME/.cargo/bin:$PATH"
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+
+# go
+export GOPATH="$HOME/works/go"
+export PATH="$PATH:$GOPATH/bin"
+export CDPATH="$CDPATH:$GOPATH/src/github.com/streamroot"
 
 # prompt
 export PS1="\[\033[01;32m\][\u@\h:\w]\[\033[01;00m\]$ "
 
-# if [[ ! $DISPLAY && $XDG_VTR -eq 1 ]]; then
-#  exec startx
-# fi
+# terraform
+export TF_CREDS="/home/jean/.config/gcloud/jean-terraform-admin.json"
 
-# starting ssh-agent
-eval "$(keychain --eval -q --agents ssh ~/.ssh/id_rsa)"
+# bash completion
+source /usr/share/bash-completion/bash_completion
+
+# swiss
+eval "$(register-python-argcomplete swiss)"
+export PATH="$PATH:$HOME/.local/bin"
+# deploy
+export PATH="$PATH:$HOME/works/infra-cli/bin"
 
 # start X server when logging in
-echo "Starting X..."
-exec startx
-
+if [[ ! $DISPLAY ]]; then
+    echo "Starting X..."
+    exec startx
+fi
+export XDG_CONFIG_HOME=/home/jean/.config

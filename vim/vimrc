@@ -1,8 +1,13 @@
 " Vim configuration file
-" TODO: status bar, file name, git branch, mode, lsp server on...
-" TODO: install ag as grep command and make a 'usefull' shortcut to re-edit
-" search term under cursor and just when you need to search for something
-" TODO: NEOMAKE
+" TODO: [.] status bar
+" TODO: [>] lsp server on
+" TODO: [.] ctags
+" TODO: [.] fix lsp vs syntastic clash
+" TODO: [x] fzf
+" TODO: [.] fzf colors
+" TODO: [.] NEOMAKE
+" TODO: [.] configure fzf better (qf window, furret for replacing, colors results and output in quickfix...)
+" TODO: [.] toggle quickfix, list
 
 execute pathogen#infect()
 
@@ -21,64 +26,136 @@ set background=dark
 colorscheme nnkd
 
 " split char
-set fillchars=vert:│
+set fillchars=vert:┃
 
 " special highlightings
-" json syntax highlight
-autocmd BufNewFile,BufRead *.json* set ft=javascript
-" avro syntax highlight
-autocmd BufNewFile,BufRead *.avsc set ft=javascript
+augroup Json
+    autocmd!
+    autocmd BufNewFile,BufRead *.json* set ft=javascript " json syntax highlight
+    autocmd BufNewFile,BufRead *.avsc set ft=javascript  " avro syntax highlight
+augroup END
 
 
 " ------ PLUGGINS ------ "
 
 " syntastic: syntax checker
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 3
-let g:syntastic_enable_highlighting = 1
+" TODO: activate when LSP is off
+"let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 3
+"let g:syntastic_enable_highlighting = 1
 
-" TODO: install it
 " go-vim
-" let g:go_highlight_functions = 1
-" let g:go_highlight_methods = 1
-" let g:go_highlight_structs = 1
-" let g:go_highlight_interfaces = 1
-" let g:go_highlight_operators = 1
-" let g:go_highlight_build_constraints = 1
-" let g:go_highlight_extra_types = 1
-" let g:go_highlight_function_calls = 1
-" let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_interfaces = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_fields = 1
 
 " vim-racer: uses Racer for Rust code completion and navigation
 set hidden 
-let g:racer_cmd = "/home/auntidjin/.cargo/bin/racer"
+let g:racer_cmd = "/home/jean/.cargo/bin/racer"
+let g:racer_experimental_completer = 1
+
+" rust.vim
+" rustfmt on save
+" TODO: activate when rust lsp is off
+" let g:rustfmt_autosave = 1
+let g:rustfmt_options = '--edition 2018'
 
 " ctrlp.vim: full path fuzzy finder
 set runtimepath^=~/.vim/bundle/ctrlp.vim
-
-" NERDTree: file system explorer
-" NERDTree opens when vim opens
-autocmd vimenter * NERDTree
-" NERDTree arrows
-let g:NERDTreeDirArrowExpandable = '▶'
-let g:NERDTreeDirArrowCollapsible = '▼'
-
-" neomake
-" autocmd! BufWritePost *.rs NeomakeProject cargo
-" TODO: pimp neomake, like having a key mapping to build the project/file, for
-" now just use Neomake cargo or NeomakeProject cargo
-
-" The Silver Searcher
+" TODO: remove that when fzf AND rg is installed
 if executable('ag')
-  " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
-
   " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
 endif
+
+" NERDTree: file system explorer
+" NERDTree opens when vim opens
+augroup NERDTree
+    autocmd!
+    autocmd vimenter * NERDTree
+augroup END
+let g:NERDTreeDirArrowExpandable = '►'
+let g:NERDTreeDirArrowCollapsible = '▼'
+
+" TODO: pimp neomake, like having a key mapping to build the project/file, for
+" neomake
+" autocmd! BufWritePost *.rs NeomakeProject cargo
+" now just use Neomake cargo or NeomakeProject cargo
+let g:neomake_open_list = 2
+let g:neomake_error_sign = {
+    \ 'text': '►',
+    \ 'texthl': 'NeomakeErrorSign',
+    \ }
+
+" ripgrep: fastest grep ever (not really a plugin)
+" remap :grep to rg
+if executable('rg')
+    set grepprg=rg\ --column\ --line-number\ --no-heading\ --color=always\ --vimgrep
+endif
+
+" TODO: pimp
+" FZF: fuzzy finder for many things
+let g:fzf_buffers_jump = 0
+let g:fzf_layout = { 'down': '~30%' }
+
+" command! -bang -nargs=* Rg
+"   \ call fzf#vim#grep(
+"   \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+"   \   <bang>0 ? fzf#vim#with_preview('up:10%')
+"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+"   \   <bang>0)
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1)
+  
+" let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+" selects result of fzf search and add it to new quickfix list
+" TODO: quickfix name
+function! s:build_quickfix_list(lines)
+    let originalw=winnr() " trick to come back to original window
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
+    exec originalw.'wincmd w'
+endfunction
+
+let g:fzf_action = {
+  \ 'ctrl-q': function('s:build_quickfix_list'),
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-h': 'split',
+  \ 'ctrl-v': 'vsplit' }
+  
+let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+
+" TODO:
+" let g:fzf_colors =
+" \ { 'fg':      ['fg', 'Normal'],
+"   \ 'bg':      ['bg', 'Normal'],
+"   \ 'hl':      ['fg', 'Comment'],
+"   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+"   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+"   \ 'hl+':     ['fg', 'Statement'],
+"   \ 'info':    ['fg', 'PreProc'],
+"   \ 'border':  ['fg', 'Ignore'],
+"   \ 'prompt':  ['fg', 'Conditional'],
+"   \ 'pointer': ['fg', 'Exception'],
+"   \ 'marker':  ['fg', 'Keyword'],
+"   \ 'spinner': ['fg', 'Label'],
+"   \ 'header':  ['fg', 'Comment'] }
+"
+
+" terraform
+let g:terraform_align=1
+let g:terraform_fmt_on_save=1
 
 " ------ OPTIONS ------ "
 
@@ -91,15 +168,15 @@ set wildmenu
 " highlights cursor's line
 set cursorline 
 
-" sets line numbers on and relative numbers
-set number relativenumber
+" sets line numbers on and relative numbers except in nerdtree
+" set number relativenumber
 
 " highlights matching braces
 set showmatch
 
 " intelligent comments
 set comments=sl:/*,mb:\ *,elx:\ */
- 
+
 " uses indentation of previous line and smartindent (indent after {...)
 set autoindent smartindent
 " configures tabwidth and insert spaces instead of tabs
@@ -108,7 +185,7 @@ set shiftwidth=4 " indent with 4 spaces
 set expandtab    " expand tab to spaces
 
 " sets the command window height to 2 lines, to avoid many cases of having to
-" "press <Enter> to continue"
+" press <Enter> to continue"
 set cmdheight=2
 
 " highlights search result and enableds incremental results
@@ -122,10 +199,12 @@ set splitbelow splitright
 set noequalalways
 
 " most of my mapping are just 2 keys so you can type pretty fast
-set timeoutlen=200
+set timeoutlen=400
 
 " custom grep command that opens result in quickfix window
-command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+" command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+" command -nargs=+ -complete=file -bar Rg silent! grep! <args>|cwindow|redraw!
+
 
 " ------ STATUS LINE ------ "
 
@@ -134,6 +213,13 @@ set laststatus=2
  
 
 " ------ LSP SERVERS ------ "
+let g:current_lsp_server = ''
+
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_signs_error = {'text': 'x'}
+let g:lsp_signs_warning = {'text': '>>'}
+let g:lsp_signs_hint = {'text': '!'}
+let g:lsp_signs_information = {'text': '?'}
 
 " " go
 " if executable('go-langserver')
@@ -177,8 +263,6 @@ set laststatus=2
 " endif
 
 " python
-" TODO: needs to be fixed, because pip is not working (pip install
-" python-language-server)
 " if executable('pyls')
 "     autocmd User lsp_setup call lsp#register_server({
 "         \ 'name': 'pyls',
@@ -188,10 +272,36 @@ set laststatus=2
 "         \ })
 " endif
 
-" flow
+" rust
+if executable('rls')
+    let g:current_lsp_server = {
+        \ 'name': 'rls',
+        \ 'cmd': {server_info->['rustup', 'run', 'stable', 'rls']},
+        \ 'workspace_config': {'rust': {'clippy_preference': 'on'}},
+        \ 'whitelist': ['rust'],
+        \ }
+    au User lsp_setup call lsp#register_server(g:current_lsp_server)
+endif
 
 
 " ------ KEY MAPPINGS ------ "
+
+" fix meta-keys which generate <Esc>a .. <Esc>z
+for c in ['1', '0', 'd', 'r', 't', 'a', 'l', 'x', 'k', 'j', 'o', 'i']
+    exec "set <M-".c.">=\e".c
+    exec "nnoremap \e".c." <M-".c.">"
+endfor
+
+" let c='a'
+" while c <= 'z'
+"     exec "set <M-".c.">=\e".c
+"     exec "map \e".c." <M-".c.">"
+"     let c = nr2char(1+char2nr(c))
+" endw
+" for c in ['0', '1']
+"     exec "set <M-".c.">=\e".c
+"     exec "map \e".c." <M-".c.">"
+" endfor
 
 " window movement 
 nnoremap <C-h> <C-w>h
@@ -223,36 +333,130 @@ nnoremap <leader>gp :Gpush<CR>
 
 " NERDTree
 " toggles NERDTree
-nnoremap <silent> <leader>ls :NERDTreeToggle<CR> :set equalalways<CR>
+nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 " replaces default NERDTree vsplit and hslpit to match CtrlP mappings
 let NERDTreeMapOpenSplit='<C-H>'
-let NERDTreeMapOpenVSplit='<C-V>'
+let NERDTreeMapOpenVSplit='<C-X>'
 
-" TODO: I don't remember this thing
+" quickfix window
 " opens quick fix window result in a horizontal split
-autocmd! FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L                                                                                                                                             
+augroup Quickfix
+    autocmd!
+    autocmd FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
+augroup END
+" browse quickfix results
+nnoremap <A-j> :cn<CR>
+nnoremap <A-k> :cp<CR>
+nnoremap <A-o> :colder<CR>
+nnoremap <A-i> :cnewer<CR>
+
 " press <space> r to grep word under cursor
 " (trick to get the grep query added to cmd history to edit query if need be)
-nnoremap <leader>r :let cmd="Ag " . expand('<cword>') <bar> call histadd("cmd", cmd) <bar> execute cmd<CR>
+nnoremap <leader>r :let cmd="Rg " . expand('<cword>') <bar> call histadd("cmd", cmd) <bar> execute cmd<CR>
 
+" fzf history
+nnoremap <silent> <leader>h :History:<CR>
+" fzf search
+nnoremap <silent> <leader>s :History/<CR>
+
+" TODO: concatenate those functions BELOW
 " custom helper toggles
-" toggles number and relativenumber
-nnoremap <silent> <leader>n :setlocal number! relativenumber!<CR>
+" toggles number and relativenumber locally and globally
+let g:Number = &l:number
+function GetNumber()
+    echom g:Number
+endfunction
+
+function SetLocalNumbers()
+    if &ft == "nerdtree"
+        set nonumber
+        set norelativenumber
+    else
+        let &l:number = g:Number
+        let &l:relativenumber = g:Number
+    endif
+endfunction
+
+function ToggleLocalNumbers()
+    let g:Number = !g:Number
+    call SetLocalNumbers()
+endfunction
+
+function ToggleGlobalNumbers()
+    call ToggleLocalNumbers()
+    let originalw=winnr() " trick to come back to original window
+    windo call SetLocalNumbers()
+    exec originalw.'wincmd w'
+endfunction
+
+augroup Numbers
+    autocmd!
+    autocmd BufNewFile,BufRead * call SetLocalNumbers()
+augroup END
+nnoremap <leader>n :call ToggleLocalNumbers()<CR>
+nnoremap <leader>N :call ToggleGlobalNumbers()<CR>
+
+" toggles wrap locally and globally
+let g:Wrap = &l:wrap
+function GetWrap()
+    echom g:Wrap
+endfunction
+
+function SetLocalWrap()
+    if &ft == "nerdtree"
+        set nowrap
+    else
+        let &l:wrap = g:Wrap
+    endif
+endfunction
+
+function ToggleLocalWrap()
+    let g:Wrap = !g:Wrap
+    call SetLocalWrap()
+endfunction
+
+function ToggleGlobalWrap()
+    call ToggleLocalWrap()
+    let originalw=winnr() " trick to come back to original window
+    windo call SetLocalWrap()
+    exec originalw.'wincmd w'
+endfunction
+
+augroup Wrap
+    autocmd!
+    autocmd BufNewFile,BufRead * call SetLocalWrap()
+augroup END
+nnoremap <leader>w :call ToggleLocalWrap()<CR>
+nnoremap <leader>W :call ToggleGlobalWrap()<CR>
+
 " press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
-" press <space> w to toggle line wrapping
-nnoremap <leader>w :set wrap!<CR>
 
 " LSP
-nnoremap <silent> <A-d> :LspDefinition<CR>
-nnoremap <silent> <A-r> :LspReferences<CR>
-nnoremap <F2> :LspRename<CR>
-nnoremap <silent> <A-a> :LspWorkspaceSymbol<CR>
-nnoremap <silent> <A-l> :LspDocumentSymbol<CR>
-nnoremap <silent> <A-x> :LspDocumentDiagnostics<CR>
+function LspServerOn()
+    call lsp#enable()
+    echo "LSP server on"
+endfunction
+
+function LspServerOff()
+    call lsp#disable()
+    echo "LSP server off"
+endfunction
+
+nnoremap <A-1> :call LspServerOn()<CR>
+nnoremap <A-0> :call LspServerOff()<CR>
+nnoremap <A-d> :LspDefinition<CR>
+nnoremap <A-r> :LspReferences<CR>
+nnoremap <A-t> :LspRename<CR>
+nnoremap <A-a> :LspWorkspaceSymbol<CR>
+nnoremap <A-l> :LspDocumentSymbol<CR>
+nnoremap <A-x> :LspDocumentDiagnostics<CR>
 
 " vim-racer 
 au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
 au FileType rust nmap <leader>rd <Plug>(rust-doc)
+
+" vim termical
+nnoremap <silent> <C-t> :terminal<CR>
