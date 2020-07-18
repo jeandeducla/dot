@@ -61,14 +61,10 @@ let g:racer_cmd = "/home/jean/.cargo/bin/racer"
 let g:racer_experimental_completer = 1
 
 " rust.vim
-" rustfmt on save
-" TODO: activate when rust lsp is off
-" let g:rustfmt_autosave = 1
 let g:rustfmt_options = '--edition 2018'
 
 " ctrlp.vim: full path fuzzy finder
 set runtimepath^=~/.vim/bundle/ctrlp.vim
-" TODO: remove that when fzf AND rg is installed
 if executable('ag')
   " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
@@ -89,11 +85,11 @@ let g:NERDTreeDirArrowCollapsible = '▼'
 " neomake
 " autocmd! BufWritePost *.rs NeomakeProject cargo
 " now just use Neomake cargo or NeomakeProject cargo
-let g:neomake_open_list = 2
-let g:neomake_error_sign = {
-    \ 'text': '►',
-    \ 'texthl': 'NeomakeErrorSign',
-    \ }
+" let g:neomake_open_list = 2
+" let g:neomake_error_sign = {
+"     \ 'text': '►',
+"     \ 'texthl': 'NeomakeErrorSign',
+"     \ }
 
 " ripgrep: fastest grep ever (not really a plugin)
 " remap :grep to rg
@@ -101,22 +97,12 @@ if executable('rg')
     set grepprg=rg\ --column\ --line-number\ --no-heading\ --color=always\ --vimgrep
 endif
 
-" TODO: pimp
 " FZF: fuzzy finder for many things
 let g:fzf_buffers_jump = 0
 let g:fzf_layout = { 'down': '~30%' }
-
-" command! -bang -nargs=* Rg
-"   \ call fzf#vim#grep(
-"   \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
-"   \   <bang>0 ? fzf#vim#with_preview('up:10%')
-"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-"   \   <bang>0)
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1)
-  
-" let g:fzf_history_dir = '~/.local/share/fzf-history'
 
 " selects result of fzf search and add it to new quickfix list
 " TODO: quickfix name
@@ -132,26 +118,9 @@ let g:fzf_action = {
   \ 'ctrl-q': function('s:build_quickfix_list'),
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-h': 'split',
-  \ 'ctrl-v': 'vsplit' }
-  
-let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+  \ 'ctrl-x': 'vsplit' }
 
-" TODO:
-" let g:fzf_colors =
-" \ { 'fg':      ['fg', 'Normal'],
-"   \ 'bg':      ['bg', 'Normal'],
-"   \ 'hl':      ['fg', 'Comment'],
-"   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-"   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-"   \ 'hl+':     ['fg', 'Statement'],
-"   \ 'info':    ['fg', 'PreProc'],
-"   \ 'border':  ['fg', 'Ignore'],
-"   \ 'prompt':  ['fg', 'Conditional'],
-"   \ 'pointer': ['fg', 'Exception'],
-"   \ 'marker':  ['fg', 'Keyword'],
-"   \ 'spinner': ['fg', 'Label'],
-"   \ 'header':  ['fg', 'Comment'] }
-"
+let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 
 " terraform
 let g:terraform_align=1
@@ -167,9 +136,6 @@ set wildmenu
 
 " highlights cursor's line
 set cursorline 
-
-" sets line numbers on and relative numbers except in nerdtree
-" set number relativenumber
 
 " highlights matching braces
 set showmatch
@@ -201,10 +167,6 @@ set noequalalways
 " most of my mapping are just 2 keys so you can type pretty fast
 set timeoutlen=400
 
-" custom grep command that opens result in quickfix window
-" command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-" command -nargs=+ -complete=file -bar Rg silent! grep! <args>|cwindow|redraw!
-
 
 " ------ STATUS LINE ------ "
 
@@ -221,57 +183,6 @@ let g:lsp_signs_warning = {'text': '>>'}
 let g:lsp_signs_hint = {'text': '!'}
 let g:lsp_signs_information = {'text': '?'}
 
-" " go
-" if executable('go-langserver')
-"     au User lsp_setup call lsp#register_server({
-"         \ 'name': 'go-langserver',
-"         \ 'cmd': {server_info->['go-langserver', '-gocodecompletion']},
-"         \ 'whitelist': ['go'],
-"         \ })
-" endif
-" 
-" " flow
-" function! s:get_node_bin(name, global_fallback)
-"     let l:nodemodules_dir = lsp#utils#find_nearest_parent_directory(lsp#utils#get_buffer_path(), 'node_modules')
-"     if !empty(nodemodules_dir)
-"         let l:bin_path = l:nodemodules_dir.'.bin/'.a:name
-"         if executable(l:bin_path)
-"             return l:bin_path
-"         endif
-"     endif
-"     if a:global_fallback && executable(a:name)
-"         return a:name
-"     endif
-"     return ''
-" endfunction
-" 
-" let g:flow_bin = s:get_node_bin('flow', 0)
-" if !empty(g:flow_bin)
-"     autocmd User lsp_setup call lsp#register_server({
-"         \ 'name': 'flow',
-"         \ 'cmd': {server_info->[g:flow_bin] + ['lsp']},
-"         \ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.flowconfig'))},
-"         \ 'whitelist': ['javascript', 'javascript.jsx'],
-"         \ })
-" endif
-
-" TODO: configure that
-" let g:eslint_bin = s:get_node_bin('eslint', 1)
-" if executable(g:eslint_bin)
-"     let g:syntastic_javascript_checkers = ['eslint']
-"     let g:syntastic_javascript_eslint_exec = g:eslint_bin
-" endif
-
-" python
-" if executable('pyls')
-"     autocmd User lsp_setup call lsp#register_server({
-"         \ 'name': 'pyls',
-"         \ 'cmd': {server_info->['pyls']},
-"         \ 'whitelist': ['python'],
-"         \ 'workspace_config': {'pyls': {'plugins': {'pycodestyle': {'maxLineLength': 99}}}}
-"         \ })
-" endif
-
 " rust
 if executable('rls')
     let g:current_lsp_server = {
@@ -286,23 +197,6 @@ endif
 
 " ------ KEY MAPPINGS ------ "
 
-" fix meta-keys which generate <Esc>a .. <Esc>z
-for c in ['1', '0', 'd', 'r', 't', 'a', 'l', 'x', 'k', 'j', 'o', 'i']
-    exec "set <M-".c.">=\e".c
-    exec "nnoremap \e".c." <M-".c.">"
-endfor
-
-" let c='a'
-" while c <= 'z'
-"     exec "set <M-".c.">=\e".c
-"     exec "map \e".c." <M-".c.">"
-"     let c = nr2char(1+char2nr(c))
-" endw
-" for c in ['0', '1']
-"     exec "set <M-".c.">=\e".c
-"     exec "map \e".c." <M-".c.">"
-" endfor
-
 " window movement 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -312,6 +206,7 @@ nnoremap <C-Left> <C-w><Left>
 nnoremap <C-Down> <C-w><Down>
 nnoremap <C-Up> <C-w><Up>
 nnoremap <C-Right> <C-w><Right>
+
 " resizing window
 nnoremap <S-h> <C-w>>
 nnoremap <S-j> <C-w>-
@@ -335,20 +230,37 @@ nnoremap <leader>gp :Gpush<CR>
 " toggles NERDTree
 nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 " replaces default NERDTree vsplit and hslpit to match CtrlP mappings
-let NERDTreeMapOpenSplit='<C-H>'
+let NERDTreeMapOpenSplit='<C-V>'
 let NERDTreeMapOpenVSplit='<C-X>'
 
 " quickfix window
 " opens quick fix window result in a horizontal split
-augroup Quickfix
+" augroup Quickfix
+"     autocmd!
+"     autocmd FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
+" augroup END
+augroup qfpreview
     autocmd!
-    autocmd FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
+    autocmd FileType qf nmap <buffer> p <plug>(qf-preview-open)
 augroup END
+let g:qfpreview = {
+    \ 'scrollup': 'k',
+    \ 'scrolldown': 'j',
+    \ 'halfpageup': 'u',
+    \ 'halfpagedown': 'd',
+    \ 'fullpageup': 'b',
+    \ 'fullpagedown': 'f',
+    \ 'close': 'q',
+    \ 'scrollbar': 0,
+    \ 'mouseclick': 'none',
+    \ 'height': 10,
+    \ 'sign': {'text': '►', 'texthl': 'Error'},
+    \ }
 " browse quickfix results
-nnoremap <A-j> :cn<CR>
-nnoremap <A-k> :cp<CR>
-nnoremap <A-o> :colder<CR>
-nnoremap <A-i> :cnewer<CR>
+" nnoremap <A-j> :cn<CR>
+" nnoremap <A-k> :cp<CR>
+" nnoremap <A-o> :colder<CR>
+" nnoremap <A-i> :cnewer<CR>
 
 " press <space> r to grep word under cursor
 " (trick to get the grep query added to cmd history to edit query if need be)
@@ -358,43 +270,6 @@ nnoremap <leader>r :let cmd="Rg " . expand('<cword>') <bar> call histadd("cmd", 
 nnoremap <silent> <leader>h :History:<CR>
 " fzf search
 nnoremap <silent> <leader>s :History/<CR>
-
-" TODO: concatenate those functions BELOW
-" custom helper toggles
-" toggles number and relativenumber locally and globally
-let g:Number = &l:number
-function GetNumber()
-    echom g:Number
-endfunction
-
-function SetLocalNumbers()
-    if &ft == "nerdtree"
-        set nonumber
-        set norelativenumber
-    else
-        let &l:number = g:Number
-        let &l:relativenumber = g:Number
-    endif
-endfunction
-
-function ToggleLocalNumbers()
-    let g:Number = !g:Number
-    call SetLocalNumbers()
-endfunction
-
-function ToggleGlobalNumbers()
-    call ToggleLocalNumbers()
-    let originalw=winnr() " trick to come back to original window
-    windo call SetLocalNumbers()
-    exec originalw.'wincmd w'
-endfunction
-
-augroup Numbers
-    autocmd!
-    autocmd BufNewFile,BufRead * call SetLocalNumbers()
-augroup END
-nnoremap <leader>n :call ToggleLocalNumbers()<CR>
-nnoremap <leader>N :call ToggleGlobalNumbers()<CR>
 
 " toggles wrap locally and globally
 let g:Wrap = &l:wrap
@@ -443,20 +318,14 @@ function LspServerOff()
     echo "LSP server off"
 endfunction
 
-nnoremap <A-1> :call LspServerOn()<CR>
-nnoremap <A-0> :call LspServerOff()<CR>
-nnoremap <A-d> :LspDefinition<CR>
-nnoremap <A-r> :LspReferences<CR>
-nnoremap <A-t> :LspRename<CR>
-nnoremap <A-a> :LspWorkspaceSymbol<CR>
-nnoremap <A-l> :LspDocumentSymbol<CR>
-nnoremap <A-x> :LspDocumentDiagnostics<CR>
-
 " vim-racer 
 au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
 au FileType rust nmap <leader>rd <Plug>(rust-doc)
 
-" vim termical
+" vim terminal
 nnoremap <silent> <C-t> :terminal<CR>
+
+" tagbar toggle
+nnoremap <silent> <C-c> :TagbarToggle<CR>

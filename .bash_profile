@@ -24,6 +24,7 @@ export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
 # go
 export GOPATH="$HOME/works/go"
+export GOPRIVATE="github.com/streamroot/*"
 export PATH="$PATH:$GOPATH/bin"
 export CDPATH="$CDPATH:$GOPATH/src/github.com/streamroot"
 
