@@ -1,32 +1,117 @@
-" Vim configuration file
-" TODO: [.] status bar
-" TODO: [>] lsp server on
-" TODO: [.] ctags
-" TODO: [.] fix lsp vs syntastic clash
-" TODO: [x] fzf
-" TODO: [.] fzf colors
-" TODO: [.] NEOMAKE
-" TODO: [.] configure fzf better (qf window, furret for replacing, colors results and output in quickfix...)
-" TODO: [.] toggle quickfix, list
+"
+" "PC Load Letter? What da fuck does that mean?"
+"
 
-execute pathogen#infect()
+" - [>] grep
+" - [.] tabs appearance
+" - [x] ripgrep
+" - [>] terminal
+" - [.] format
 
 
-" ------ BEAUTY ------ "
+" --------------------- "
+" ----- PLUGGINS ------ "
+" --------------------- "
 
-set t_Co=16
-filetype plugin indent on
-" syntax hightlight
-if !exists("g:syntax_on")
-    syntax enable
+call plug#begin('~/.vim/plugged')
+
+Plug 'preservim/nerdtree'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'ycm-core/YouCompleteMe'
+" Plug 'sainnhe/edge'
+Plug 'neomake/neomake'
+Plug 'cespare/vim-toml'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'milkypostman/vim-togglelist'
+
+call plug#end()
+
+" NERDTree
+let g:NERDTreeDirArrowExpandable = '►'
+let g:NERDTreeDirArrowCollapsible = '▼'
+let NERDTreeMinimalUI = 1
+let NERDTreeAutoDeleteBuffer = 1
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif " NERDTree opens when executing vim alone
+
+" Neomake
+call neomake#configure#automake('w')
+let g:neomake_open_list = 2   " always opens quifixlist after building
+let g:neomake_warning_sign = {
+ \   'text': '!',
+ \   'texthl': 'NeomakeWarningSign',
+ \ }
+
+" YouCompleteMe
+let g:ycm_enable_diagnostic_signs = 0 " deactivates column signs to avoid conflicts with neomake
+let g:ycm_auto_hover = ""             " deactivates autohover
+
+" fzf
+let g:fzf_layout = { 'window': '10new' }
+let g:fzf_colors =
+            \ { 'gutter':  ['bg', 'Normal'],
+              \ 'bg+':     ['fg', 'CursorLine'],
+              \ 'info':    ['bg', 'Statement'] }
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case  --colors "match:fg:red" --colors "path:fg:blue" --colors "line:fg:white"  -- '.shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview('right:50%:noborder'), <bang>0)
+
+if executable('rg')
+  let g:ctrlp_user_command = 'rg %s --files --color=never --glob ""'
+  let g:ctrlp_use_caching = 0
 endif
 
-" color scheme
+" --------------------- "
+" ------ OPTIONS ------ "
+" --------------------- "
+
+set cursorline           " highlights cursor's line
+set hidden               " hides unsaved abandonned modified buffer
+set fillchars=vert:┃     " split char
+set path+=**             " provides tab-completion for all file-related tasks
+set wildmenu             " displays all matching files when we tab complete
+set splitbelow           " splits open at the bottom 
+set splitright           " splits on the right
+set noequalalways        " splits size don't adjust to the same
+set hlsearch             " highlights search results and 
+set incsearch            " enableds incremental results
+set autoindent           " uses indentation of previous line
+set smartindent          " smart indention for C like language
+set tabstop=4            " tab width is 4 spaces
+set shiftwidth=4         " indent with 4 spaces
+set expandtab            " expand tab to spaces
+set autoread             " automatically reads a file if it has been changed
+set completeopt-=preview " removes the preview window
+set timeoutlen=400       " most of my mapping are just 2 keys so you can type pretty fast
+set laststatus=2         " always displays the status line, even if only one window is displayed
+
+
+" --------------------- "
+" ------ COLORS ------- "
+" --------------------- "
+
 set background=dark
 colorscheme nnkd
 
-" split char
-set fillchars=vert:┃
+hi CursorLine        cterm=none ctermbg=8     ctermfg=none
+hi StatusLine        cterm=bold ctermbg=8 	  ctermfg=white
+hi StatusLineNC      cterm=none ctermbg=8 	  ctermfg=0
+hi SignColumn        cterm=none ctermbg=none  ctermfg=none
+" vertical split color
+hi VertSplit         cterm=bold ctermbg=none  ctermfg=8 
+" autocomplete results
+hi Pmenu             cterm=none ctermbg=8     ctermfg=white 
+hi PmenuSel          cterm=none ctermbg=white ctermfg=8
+" YouCompleteMe
+hi YcmErrorSign      cterm=bold ctermbg=none  ctermfg=red
+hi YcmWarningSign    cterm=bold ctermbg=none  ctermfg=yellow
+hi YcmWarningSection cterm=none ctermbg=none  ctermfg=none
+" Neomake
+hi NeomakeWarningSign cterm=bold ctermbg=none ctermfg=yellow
+hi NeomakeWarning     cterm=bold ctermbg=none ctermfg=none
 
 " special highlightings
 augroup Json
@@ -36,240 +121,9 @@ augroup Json
 augroup END
 
 
-" ------ PLUGGINS ------ "
-
-" syntastic: syntax checker
-" TODO: activate when LSP is off
-"let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 3
-"let g:syntastic_enable_highlighting = 1
-
-" go-vim
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_interfaces = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_fields = 1
-
-" vim-racer: uses Racer for Rust code completion and navigation
-set hidden 
-let g:racer_cmd = "/home/jean/.cargo/bin/racer"
-let g:racer_experimental_completer = 1
-
-" rust.vim
-let g:rustfmt_options = '--edition 2018'
-
-" ctrlp.vim: full path fuzzy finder
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-if executable('ag')
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
-endif
-
-" NERDTree: file system explorer
-" NERDTree opens when vim opens
-augroup NERDTree
-    autocmd!
-    autocmd vimenter * NERDTree
-augroup END
-let g:NERDTreeDirArrowExpandable = '►'
-let g:NERDTreeDirArrowCollapsible = '▼'
-
-" TODO: pimp neomake, like having a key mapping to build the project/file, for
-" neomake
-" autocmd! BufWritePost *.rs NeomakeProject cargo
-" now just use Neomake cargo or NeomakeProject cargo
-" let g:neomake_open_list = 2
-" let g:neomake_error_sign = {
-"     \ 'text': '►',
-"     \ 'texthl': 'NeomakeErrorSign',
-"     \ }
-
-" ripgrep: fastest grep ever (not really a plugin)
-" remap :grep to rg
-if executable('rg')
-    set grepprg=rg\ --column\ --line-number\ --no-heading\ --color=always\ --vimgrep
-endif
-
-" FZF: fuzzy finder for many things
-let g:fzf_buffers_jump = 0
-let g:fzf_layout = { 'down': '~30%' }
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1)
-
-" selects result of fzf search and add it to new quickfix list
-" TODO: quickfix name
-function! s:build_quickfix_list(lines)
-    let originalw=winnr() " trick to come back to original window
-    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-    copen
-    cc
-    exec originalw.'wincmd w'
-endfunction
-
-let g:fzf_action = {
-  \ 'ctrl-q': function('s:build_quickfix_list'),
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-h': 'split',
-  \ 'ctrl-x': 'vsplit' }
-
-let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
-
-" terraform
-let g:terraform_align=1
-let g:terraform_fmt_on_save=1
-
-" ------ OPTIONS ------ "
-
-" searches down into subfolders
-" provides tab-completion for all file-related tasks
-set path+=**
-" displays all matching files when we tab complete
-set wildmenu
-
-" highlights cursor's line
-set cursorline 
-
-" highlights matching braces
-set showmatch
-
-" intelligent comments
-set comments=sl:/*,mb:\ *,elx:\ */
-
-" uses indentation of previous line and smartindent (indent after {...)
-set autoindent smartindent
-" configures tabwidth and insert spaces instead of tabs
-set tabstop=4    " tab width is 4 spaces
-set shiftwidth=4 " indent with 4 spaces
-set expandtab    " expand tab to spaces
-
-" sets the command window height to 2 lines, to avoid many cases of having to
-" press <Enter> to continue"
-set cmdheight=2
-
-" highlights search result and enableds incremental results
-set hlsearch incsearch
-
-" automatically reads a file if it has been changed
-set autoread
-
-" splits open at the bottom or on the right
-set splitbelow splitright
-set noequalalways
-
-" most of my mapping are just 2 keys so you can type pretty fast
-set timeoutlen=400
-
-
-" ------ STATUS LINE ------ "
-
-" always displays the status line, even if only one window is displayed
-set laststatus=2
- 
-
-" ------ LSP SERVERS ------ "
-let g:current_lsp_server = ''
-
-let g:lsp_diagnostics_echo_cursor = 1
-let g:lsp_signs_error = {'text': 'x'}
-let g:lsp_signs_warning = {'text': '>>'}
-let g:lsp_signs_hint = {'text': '!'}
-let g:lsp_signs_information = {'text': '?'}
-
-" rust
-if executable('rls')
-    let g:current_lsp_server = {
-        \ 'name': 'rls',
-        \ 'cmd': {server_info->['rustup', 'run', 'stable', 'rls']},
-        \ 'workspace_config': {'rust': {'clippy_preference': 'on'}},
-        \ 'whitelist': ['rust'],
-        \ }
-    au User lsp_setup call lsp#register_server(g:current_lsp_server)
-endif
-
-
-" ------ KEY MAPPINGS ------ "
-
-" window movement 
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap <C-Left> <C-w><Left>
-nnoremap <C-Down> <C-w><Down>
-nnoremap <C-Up> <C-w><Up>
-nnoremap <C-Right> <C-w><Right>
-
-" resizing window
-nnoremap <S-h> <C-w>>
-nnoremap <S-j> <C-w>-
-nnoremap <S-k> <C-w>+
-nnoremap <S-l> <C-w><
-nnoremap <S-Left> <C-w>>
-nnoremap <S-Down> <C-w>-
-nnoremap <S-Up> <C-w>+
-nnoremap <S-Right> <C-w><
-
-" uses <space> as leader
-let g:mapleader = "\<space>"
- 
-" fugitive
-nnoremap <leader>gd :Gdiff<CR>
-nnoremap <leader>gs :Gstatus<CR>
-nnoremap <leader>gl :Gpull<CR>
-nnoremap <leader>gp :Gpush<CR>
-
-" NERDTree
-" toggles NERDTree
-nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
-" replaces default NERDTree vsplit and hslpit to match CtrlP mappings
-let NERDTreeMapOpenSplit='<C-V>'
-let NERDTreeMapOpenVSplit='<C-X>'
-
-" quickfix window
-" opens quick fix window result in a horizontal split
-" augroup Quickfix
-"     autocmd!
-"     autocmd FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
-" augroup END
-augroup qfpreview
-    autocmd!
-    autocmd FileType qf nmap <buffer> p <plug>(qf-preview-open)
-augroup END
-let g:qfpreview = {
-    \ 'scrollup': 'k',
-    \ 'scrolldown': 'j',
-    \ 'halfpageup': 'u',
-    \ 'halfpagedown': 'd',
-    \ 'fullpageup': 'b',
-    \ 'fullpagedown': 'f',
-    \ 'close': 'q',
-    \ 'scrollbar': 0,
-    \ 'mouseclick': 'none',
-    \ 'height': 10,
-    \ 'sign': {'text': '►', 'texthl': 'Error'},
-    \ }
-" browse quickfix results
-" nnoremap <A-j> :cn<CR>
-" nnoremap <A-k> :cp<CR>
-" nnoremap <A-o> :colder<CR>
-" nnoremap <A-i> :cnewer<CR>
-
-" press <space> r to grep word under cursor
-" (trick to get the grep query added to cmd history to edit query if need be)
-nnoremap <leader>r :let cmd="Rg " . expand('<cword>') <bar> call histadd("cmd", cmd) <bar> execute cmd<CR>
-
-" fzf history
-nnoremap <silent> <leader>h :History:<CR>
-" fzf search
-nnoremap <silent> <leader>s :History/<CR>
+" --------------------- "
+" --- CUSTOM FUNCS ---- "
+" --------------------- "
 
 " toggles wrap locally and globally
 let g:Wrap = &l:wrap
@@ -301,31 +155,55 @@ augroup Wrap
     autocmd!
     autocmd BufNewFile,BufRead * call SetLocalWrap()
 augroup END
-nnoremap <leader>w :call ToggleLocalWrap()<CR>
-nnoremap <leader>W :call ToggleGlobalWrap()<CR>
+
+
+" --------------------- "
+" --- KEY MAPPINGS ---- "
+" --------------------- "
+
+" uses <space> as leader
+let g:mapleader = "\<space>"
+
+" window movements
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" quickfix and location lists
+" nnoremap <silent> <leader>q :copen<CR>
+nnoremap <silent> ]q :cnext<CR>
+nnoremap <silent> [q :cprevious<CR>
+nnoremap <silent> ]w :lnext<CR>
+nnoremap <silent> [w :lprevious<CR>
+
+" tabs
+nnoremap <silent> <S-Right> :tabn<CR>
+nnoremap <silent> <S-Left> :tabN<CR>
+nnoremap <silent> <S-l> :tabn<CR>
+nnoremap <silent> <S-h> :tabN<CR>
+
+" global and local wrapping
+nnoremap <silent> <leader>w :call ToggleLocalWrap()<CR>
+nnoremap <silent> <leader>W :call ToggleGlobalWrap()<CR>
 
 " press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
 
-" LSP
-function LspServerOn()
-    call lsp#enable()
-    echo "LSP server on"
-endfunction
+" NERDTree
+nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 
-function LspServerOff()
-    call lsp#disable()
-    echo "LSP server off"
-endfunction
+" fugitive
+nnoremap <leader>gd :Gdiff<CR>
+nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gl :Gpull<CR>
+nnoremap <leader>gp :Gpush<CR>
 
-" vim-racer 
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>rd <Plug>(rust-doc)
+" YouCompleteMe
+nnoremap gd :YcmCompleter GoTo<CR>
+nnoremap gf :YcmCompleter GoToReferences<CR>
+nnoremap gr :YcmCompleter RefactorRename 
+nmap <leader>. <plug>(YCMHover)
 
-" vim terminal
-nnoremap <silent> <C-t> :terminal<CR>
-
-" tagbar toggle
-nnoremap <silent> <C-c> :TagbarToggle<CR>
+" terminal
+nnoremap <silent> <C-t> :terminal ++close<CR>

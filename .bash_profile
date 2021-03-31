@@ -20,7 +20,7 @@ export CDPATH=~/works/
 
 # rust
 export PATH="$PATH:$HOME/.cargo/bin"
-export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/library"
 
 # go
 export GOPATH="$HOME/works/go"
@@ -43,9 +43,16 @@ export PATH="$PATH:$HOME/.local/bin"
 # deploy
 export PATH="$PATH:$HOME/works/infra-cli/bin"
 
+# pyenv
+eval "$(pyenv init -)"
+
 # start X server when logging in
-if [[ ! $DISPLAY ]]; then
-    echo "Starting X..."
-    exec startx
-fi
-export XDG_CONFIG_HOME=/home/jean/.config
+# if [[ ! $DISPLAY ]]; then
+#     echo "Starting X..."
+#     exec startx
+# fi
+# export XDG_CONFIG_HOME=/home/jean/.config
+
+xset -b
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

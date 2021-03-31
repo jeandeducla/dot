@@ -98,6 +98,12 @@ hi VertSplit    cterm=bold ctermbg=none ctermfg=8
 hi StatusLine     cterm=bold ctermbg=8 ctermfg=white
 hi StatusLineNC   cterm=none ctermbg=8 ctermfg=0
 
+" Tabs
+hi TabLineFill cterm=none ctermbg=8    ctermfg=white
+hi TabLine     cterm=none ctermbg=8    ctermfg=none
+hi TabLineSel  cterm=bold ctermbg=none ctermfg=white
+" hi TabLineFill cterm=none ctermbg=none ctermfg=none
+
 " Markdown
 hi link markdownH1 Special
 hi link markdownH2 Special
@@ -114,10 +120,10 @@ hi SignColumn cterm=none ctermbg=none ctermfg=white
 " Quickfix
 hi link qfFileName Identifier
 
-hi DiffAdd    cterm=none ctermfg=green ctermbg=8
-hi DiffDelete cterm=none ctermfg=red   ctermbg=8
-hi DiffChange cterm=none ctermfg=green ctermbg=8
-hi DiffText   cterm=none ctermfg=green ctermbg=8
+hi DiffAdd    cterm=none ctermfg=green ctermbg=none
+hi DiffDelete cterm=none ctermfg=red   ctermbg=none
+hi DiffChange cterm=none ctermfg=yellow ctermbg=none
+hi DiffText   cterm=none ctermfg=green ctermbg=none
 
 " Language specific
 hi GoString cterm=none ctermbg=none ctermfg=blue
