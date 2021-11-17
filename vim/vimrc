@@ -4,9 +4,12 @@
 
 " - [>] grep
 " - [.] tabs appearance
-" - [x] ripgrep
 " - [>] terminal
 " - [.] format
+"
+" - [.] SYNTAX highlight is bad
+" - [.] TRUE COLOR terminal?
+" - [.] theme
 
 
 " --------------------- "
@@ -18,13 +21,11 @@ call plug#begin('~/.vim/plugged')
 Plug 'preservim/nerdtree'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'ycm-core/YouCompleteMe'
-" Plug 'sainnhe/edge'
-Plug 'neomake/neomake'
 Plug 'cespare/vim-toml'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
 Plug 'milkypostman/vim-togglelist'
+Plug 'leafgarland/typescript-vim'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
@@ -36,33 +37,24 @@ let NERDTreeAutoDeleteBuffer = 1
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif " NERDTree opens when executing vim alone
 
-" Neomake
-call neomake#configure#automake('w')
-let g:neomake_open_list = 2   " always opens quifixlist after building
-let g:neomake_warning_sign = {
- \   'text': '!',
- \   'texthl': 'NeomakeWarningSign',
- \ }
 
-" YouCompleteMe
-let g:ycm_enable_diagnostic_signs = 0 " deactivates column signs to avoid conflicts with neomake
-let g:ycm_auto_hover = ""             " deactivates autohover
+" coc
+" <tab> for coc completion
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" fzf
-let g:fzf_layout = { 'window': '10new' }
-let g:fzf_colors =
-            \ { 'gutter':  ['bg', 'Normal'],
-              \ 'bg+':     ['fg', 'CursorLine'],
-              \ 'info':    ['bg', 'Statement'] }
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case  --colors "match:fg:red" --colors "path:fg:blue" --colors "line:fg:white"  -- '.shellescape(<q-args>), 1,
-  \   fzf#vim#with_preview('right:50%:noborder'), <bang>0)
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
-if executable('rg')
-  let g:ctrlp_user_command = 'rg %s --files --color=never --glob ""'
-  let g:ctrlp_use_caching = 0
-endif
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " --------------------- "
 " ------ OPTIONS ------ "
@@ -87,14 +79,17 @@ set autoread             " automatically reads a file if it has been changed
 set completeopt-=preview " removes the preview window
 set timeoutlen=400       " most of my mapping are just 2 keys so you can type pretty fast
 set laststatus=2         " always displays the status line, even if only one window is displayed
+set cmdheight=1          " comand line height
+set updatetime=300       " better for coc experience
 
 
 " --------------------- "
 " ------ COLORS ------- "
 " --------------------- "
 
+syntax enable
 set background=dark
-colorscheme nnkd
+"colorscheme nnkd
 
 hi CursorLine        cterm=none ctermbg=8     ctermfg=none
 hi StatusLine        cterm=bold ctermbg=8 	  ctermfg=white
@@ -105,13 +100,16 @@ hi VertSplit         cterm=bold ctermbg=none  ctermfg=8
 " autocomplete results
 hi Pmenu             cterm=none ctermbg=8     ctermfg=white 
 hi PmenuSel          cterm=none ctermbg=white ctermfg=8
-" YouCompleteMe
-hi YcmErrorSign      cterm=bold ctermbg=none  ctermfg=red
-hi YcmWarningSign    cterm=bold ctermbg=none  ctermfg=yellow
-hi YcmWarningSection cterm=none ctermbg=none  ctermfg=none
-" Neomake
-hi NeomakeWarningSign cterm=bold ctermbg=none ctermfg=yellow
-hi NeomakeWarning     cterm=bold ctermbg=none ctermfg=none
+" fugitive diff
+hi DiffAdd    cterm=none ctermfg=green ctermbg=none
+hi DiffDelete cterm=none ctermfg=red   ctermbg=none
+hi DiffChange cterm=none ctermfg=yellow ctermbg=none
+hi DiffText   cterm=none ctermfg=green ctermbg=none
+" coc
+hi CocErrorHighlight   cterm=bold ctermbg=none ctermfg=red
+hi CocWarningHighlight cterm=underline ctermbg=none ctermfg=yellow
+hi CocInfoHighlight    cterm=none ctermbg=none ctermfg=green
+hi CocErrorSign        cterm=bold ctermbg=none ctermfg=red
 
 " special highlightings
 augroup Json
@@ -120,6 +118,8 @@ augroup Json
     autocmd BufNewFile,BufRead *.avsc set ft=javascript  " avro syntax highlight
 augroup END
 
+" special indent for json files
+autocmd Filetype json setlocal ts=2 sw=2 expandtab
 
 " --------------------- "
 " --- CUSTOM FUNCS ---- "
@@ -170,12 +170,19 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
+nnoremap <C-Left>  <C-w>h
+nnoremap <C-Down>  <C-w>j
+nnoremap <C-Up>    <C-w>k
+nnoremap <C-Right> <C-w>l
+
 " quickfix and location lists
 " nnoremap <silent> <leader>q :copen<CR>
 nnoremap <silent> ]q :cnext<CR>
 nnoremap <silent> [q :cprevious<CR>
-nnoremap <silent> ]w :lnext<CR>
-nnoremap <silent> [w :lprevious<CR>
+nnoremap <silent> <S-j> :lnext<CR>
+nnoremap <silent> <S-k> :lprevious<CR>
+" nnoremap <silent> ]w :lnext<CR>
+" nnoremap <silent> [w :lprevious<CR>
 
 " tabs
 nnoremap <silent> <S-Right> :tabn<CR>
@@ -194,16 +201,17 @@ nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
 nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 
 " fugitive
-nnoremap <leader>gd :Gdiff<CR>
-nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gd :Gvdiffsplit<CR>
+nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gl :Gpull<CR>
 nnoremap <leader>gp :Gpush<CR>
 
-" YouCompleteMe
-nnoremap gd :YcmCompleter GoTo<CR>
-nnoremap gf :YcmCompleter GoToReferences<CR>
-nnoremap gr :YcmCompleter RefactorRename 
-nmap <leader>. <plug>(YCMHover)
+" Coc
+nmap gd <Plug>(coc-definition)
+nmap gy <Plug>(coc-type-definition)
+nmap gi <Plug>(coc-implementation)
+nmap gr <Plug>(coc-references)
+nmap <leader>R <Plug>(coc-rename)
 
 " terminal
 nnoremap <silent> <C-t> :terminal ++close<CR>
