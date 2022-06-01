@@ -22,6 +22,7 @@ Plug 'preservim/nerdtree'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'cespare/vim-toml'
+Plug 'rust-lang/rust.vim'
 Plug 'milkypostman/vim-togglelist'
 Plug 'leafgarland/typescript-vim'
 Plug 'maxmellon/vim-jsx-pretty'
@@ -32,6 +33,7 @@ call plug#end()
 " NERDTree
 let g:NERDTreeDirArrowExpandable = '►'
 let g:NERDTreeDirArrowCollapsible = '▼'
+let g:NERDTreeMapOpenVSplit = 'v'
 let NERDTreeMinimalUI = 1
 let NERDTreeAutoDeleteBuffer = 1
 autocmd StdinReadPre * let s:std_in=1
@@ -56,9 +58,21 @@ endfunction
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
+
+" rust.vim
+" rusfmt on save
+let g:rustfmt_autosave = 1
+
+
+" ctrlp
+let g:ctrlp_prompt_mappings = {
+    \ 'AcceptSelection("h")': ['<c-i>'],
+    \ }
+
 " --------------------- "
 " ------ OPTIONS ------ "
 " --------------------- "
+
 
 set cursorline           " highlights cursor's line
 set hidden               " hides unsaved abandonned modified buffer
@@ -78,7 +92,7 @@ set expandtab            " expand tab to spaces
 set autoread             " automatically reads a file if it has been changed
 set completeopt-=preview " removes the preview window
 set timeoutlen=400       " most of my mapping are just 2 keys so you can type pretty fast
-set laststatus=2         " always displays the status line, even if only one window is displayed
+set laststatus=2         " always dislays the status line, even if only one window is displayed
 set cmdheight=1          " comand line height
 set updatetime=300       " better for coc experience
 
@@ -88,6 +102,8 @@ set updatetime=300       " better for coc experience
 " --------------------- "
 
 syntax enable
+"for rust.vim
+filetype plugin indent on
 set background=dark
 "colorscheme nnkd
 
@@ -97,19 +113,39 @@ hi StatusLineNC      cterm=none ctermbg=8 	  ctermfg=0
 hi SignColumn        cterm=none ctermbg=none  ctermfg=none
 " vertical split color
 hi VertSplit         cterm=bold ctermbg=none  ctermfg=8 
+
 " autocomplete results
 hi Pmenu             cterm=none ctermbg=8     ctermfg=white 
 hi PmenuSel          cterm=none ctermbg=white ctermfg=8
+
 " fugitive diff
 hi DiffAdd    cterm=none ctermfg=green ctermbg=none
 hi DiffDelete cterm=none ctermfg=red   ctermbg=none
 hi DiffChange cterm=none ctermfg=yellow ctermbg=none
 hi DiffText   cterm=none ctermfg=green ctermbg=none
+
+" Git Status colors
+hi diffAdded   cterm=none ctermfg=40 ctermbg=none 
+hi diffRemoved cterm=none ctermfg=196 ctermbg=none
+hi diffChanged cterm=none ctermfg=208 ctermbg=none
+
 " coc
-hi CocErrorHighlight   cterm=bold ctermbg=none ctermfg=red
-hi CocWarningHighlight cterm=underline ctermbg=none ctermfg=yellow
-hi CocInfoHighlight    cterm=none ctermbg=none ctermfg=green
 hi CocErrorSign        cterm=bold ctermbg=none ctermfg=red
+hi CocErrorHighlight   cterm=bold ctermbg=none ctermfg=red
+
+hi CocWarningHighlight cterm=italic ctermbg=none ctermfg=208
+hi CocWarningSign      cterm=none   ctermbg=none ctermfg=208
+hi CocWarningLine      cterm=italic ctermbg=none ctermfg=208
+
+hi CocHintHighlight cterm=italic ctermbg=none ctermfg=226
+hi CocHintSign      cterm=italic ctermbg=none ctermfg=226
+
+hi CocInfoHighlight cterm=none ctermbg=none ctermfg=green
+
+" Tabs
+hi TabLineFill cterm=none ctermbg=8    ctermfg=white
+hi TabLine     cterm=none ctermbg=8    ctermfg=none
+hi TabLineSel  cterm=bold ctermbg=none ctermfg=white
 
 " special highlightings
 augroup Json
@@ -211,7 +247,11 @@ nmap gd <Plug>(coc-definition)
 nmap gy <Plug>(coc-type-definition)
 nmap gi <Plug>(coc-implementation)
 nmap gr <Plug>(coc-references)
-nmap <leader>R <Plug>(coc-rename)
+nmap R <Plug>(coc-rename)
+nmap ;; <Plug>(coc-diagnostic-prev)
+nmap '' <Plug>(coc-diagnostic-next)
 
 " terminal
 nnoremap <silent> <C-t> :terminal ++close<CR>
+
+inoremap <C-[> <Esc>:w<Cr>
