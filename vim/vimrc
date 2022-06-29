@@ -61,7 +61,7 @@ Plug 'milkypostman/vim-togglelist'
 Plug 'leafgarland/typescript-vim'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'Yggdroot/indentLine'
+Plug 'nathanaelkane/vim-indent-guides'
 
 call plug#end()
 
@@ -212,11 +212,11 @@ autocmd Filetype json setlocal ts=2 sw=2 expandtab
 
 " toggles wrap locally and globally
 let g:Wrap = &l:wrap
-function GetWrap()
+function! GetWrap()
     echom g:Wrap
 endfunction
 
-function SetLocalWrap()
+function! SetLocalWrap()
     if &ft == "nerdtree"
         set nowrap
     else
@@ -224,12 +224,12 @@ function SetLocalWrap()
     endif
 endfunction
 
-function ToggleLocalWrap()
+function! ToggleLocalWrap()
     let g:Wrap = !g:Wrap
     call SetLocalWrap()
 endfunction
 
-function ToggleGlobalWrap()
+function! ToggleGlobalWrap()
     call ToggleLocalWrap()
     let originalw=winnr() " trick to come back to original window
     windo call SetLocalWrap()
