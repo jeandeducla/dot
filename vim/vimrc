@@ -10,6 +10,38 @@
 " - [.] SYNTAX highlight is bad
 " - [.] TRUE COLOR terminal?
 " - [.] theme
+"
+" As of 2022-06-01
+" - [.] SYNTAX highlight is bad
+" - [.] Ripgrep needs to be back
+" - [.] Fuzzy finder?
+" - [x] window resizing needs to be back
+" - [.] Some coc.vim tuning such as:
+"   - [.] Replacing in big projects, opens tabs for every file where there is
+"   a replace
+" - [.] Pimp fugitive
+"   - [x] goback in file history
+"   - [x] Gitblame
+"   - [.] some nicer shortcuts
+" - [.] Use Ripgrep for CtrlP
+
+
+" - [x] Use Ripgrep for CtrlP
+" - [.] fuzzy file finder
+" - [.] smaller police
+" - [.] better color scheme
+" - [.] better fugitive color scheme
+" - [x] CtrlP defaults to last visited files
+" - [.] switch buffers? maybe just with CtrlP
+" - [.] Line Number toggles
+" - [.] Git gutter and something to jumpt to next modification in file
+" - [.] git diff on file toggle
+" - [.] Nerdtree opens to current file
+" - [.] nicer coc.vim interface (no rounded borders)
+" - [.] coc.vim suggestion
+" - [.] coc.vim hover
+" - [.] Camel Case jump?
+" - [.] git status toggle
 
 
 " --------------------- "
@@ -68,11 +100,17 @@ let g:rustfmt_autosave = 1
 let g:ctrlp_prompt_mappings = {
     \ 'AcceptSelection("h")': ['<c-i>'],
     \ }
+let g:ctrlp_cmd = 'CtrlPBuffer'
+if executable('rg') 
+    let g:ctrlp_user_command = 'rg --files %s'
+    " let g:ctrlp_user_cashing = 0
+    " let g:ctrlp_user_command = 'rg --files %s'
+    " let g:ctrlp_user_command = 'rg --files %s'
+endif
 
 " --------------------- "
 " ------ OPTIONS ------ "
 " --------------------- "
-
 
 set cursorline           " highlights cursor's line
 set hidden               " hides unsaved abandonned modified buffer
@@ -211,18 +249,22 @@ nnoremap <C-Down>  <C-w>j
 nnoremap <C-Up>    <C-w>k
 nnoremap <C-Right> <C-w>l
 
+" window resizes
+nnoremap <S-Left>  <C-w>>
+nnoremap <S-Down>  <C-w>-
+nnoremap <S-Up>    <C-w>+
+nnoremap <S-Right> <C-w><
+
 " quickfix and location lists
 " nnoremap <silent> <leader>q :copen<CR>
 nnoremap <silent> ]q :cnext<CR>
 nnoremap <silent> [q :cprevious<CR>
-nnoremap <silent> <S-j> :lnext<CR>
-nnoremap <silent> <S-k> :lprevious<CR>
+nnoremap <silent> <M-j> :lnext<CR>
+nnoremap <silent> <M-k> :lprevious<CR>
 " nnoremap <silent> ]w :lnext<CR>
 " nnoremap <silent> [w :lprevious<CR>
 
 " tabs
-nnoremap <silent> <S-Right> :tabn<CR>
-nnoremap <silent> <S-Left> :tabN<CR>
 nnoremap <silent> <S-l> :tabn<CR>
 nnoremap <silent> <S-h> :tabN<CR>
 
@@ -239,8 +281,10 @@ nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 " fugitive
 nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gs :Git<CR>
+nnoremap <leader>gst :tabnew<Bar>:Git<CR>
 nnoremap <leader>gl :Gpull<CR>
 nnoremap <leader>gp :Gpush<CR>
+nnoremap <leader>gb :G blame<CR>
 
 " Coc
 nmap gd <Plug>(coc-definition)
