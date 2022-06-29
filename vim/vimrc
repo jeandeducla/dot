@@ -42,6 +42,8 @@
 " - [.] coc.vim hover
 " - [.] Camel Case jump?
 " - [.] git status toggle
+" - [.] Ctrl+w= only for buffer that are not git status and Nerdtree
+" - [.] indentation level
 
 
 " --------------------- "
@@ -59,6 +61,7 @@ Plug 'milkypostman/vim-togglelist'
 Plug 'leafgarland/typescript-vim'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'Yggdroot/indentLine'
 
 call plug#end()
 
@@ -133,7 +136,15 @@ set timeoutlen=400       " most of my mapping are just 2 keys so you can type pr
 set laststatus=2         " always dislays the status line, even if only one window is displayed
 set cmdheight=1          " comand line height
 set updatetime=300       " better for coc experience
+set nofoldenable         " disable folding
+set foldcolumn=0         " no foldcolumn at all
 
+
+" to disable foldcolumns
+augroup NoFold
+    au!
+    au WinEnter,WinLeave * set nofen foldcolumn=0
+augroup END
 
 " --------------------- "
 " ------ COLORS ------- "
@@ -231,6 +242,14 @@ augroup Wrap
 augroup END
 
 
+function! ToggleLocalGitStatus()
+    try
+        exe filter(getwininfo(), "get(v:val['variables'], 'fugitive_status', v:false) != v:false")[0].winnr .. "wincmd c"
+    catch /E684/
+        Git
+    endtry
+endfunction
+
 " --------------------- "
 " --- KEY MAPPINGS ---- "
 " --------------------- "
@@ -244,16 +263,11 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-nnoremap <C-Left>  <C-w>h
-nnoremap <C-Down>  <C-w>j
-nnoremap <C-Up>    <C-w>k
-nnoremap <C-Right> <C-w>l
-
 " window resizes
-nnoremap <S-Left>  <C-w>>
-nnoremap <S-Down>  <C-w>-
-nnoremap <S-Up>    <C-w>+
-nnoremap <S-Right> <C-w><
+nnoremap <C-Left>  <C-w>>
+nnoremap <C-Down>  <C-w>-
+nnoremap <C-Up>    <C-w>+
+nnoremap <C-Right> <C-w><
 
 " quickfix and location lists
 " nnoremap <silent> <leader>q :copen<CR>
@@ -280,8 +294,8 @@ nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
 
 " fugitive
 nnoremap <leader>gd :Gvdiffsplit<CR>
-nnoremap <leader>gs :Git<CR>
-nnoremap <leader>gst :tabnew<Bar>:Git<CR>
+nnoremap <silent> <leader>gs :call ToggleLocalGitStatus()<CR>
+nnoremap <leader>gst :tabnew<Bar>:call ToggleLocalGitStatus()<CR>
 nnoremap <leader>gl :Gpull<CR>
 nnoremap <leader>gp :Gpush<CR>
 nnoremap <leader>gb :G blame<CR>
