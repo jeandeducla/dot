@@ -53,7 +53,7 @@
 call plug#begin('~/.vim/plugged')
 
 Plug 'preservim/nerdtree'
-Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'cespare/vim-toml'
 Plug 'rust-lang/rust.vim'
@@ -62,7 +62,8 @@ Plug 'leafgarland/typescript-vim'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'nathanaelkane/vim-indent-guides'
-
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }                                                                                                                          
 call plug#end()
 
 " NERDTree
@@ -100,16 +101,50 @@ let g:rustfmt_autosave = 1
 
 
 " ctrlp
-let g:ctrlp_prompt_mappings = {
-    \ 'AcceptSelection("h")': ['<c-i>'],
-    \ }
-let g:ctrlp_cmd = 'CtrlPBuffer'
-if executable('rg') 
-    let g:ctrlp_user_command = 'rg --files %s'
-    " let g:ctrlp_user_cashing = 0
-    " let g:ctrlp_user_command = 'rg --files %s'
-    " let g:ctrlp_user_command = 'rg --files %s'
-endif
+" let g:ctrlp_prompt_mappings = {
+"     \ 'AcceptSelection("h")': ['<c-i>'],
+"     \ }
+" let g:ctrlp_cmd = 'CtrlPBuffer'
+" if executable('rg') 
+"     let g:ctrlp_user_command = 'rg --files %s'
+"     " let g:ctrlp_user_cashing = 0
+"     " let g:ctrlp_user_command = 'rg --files %s'
+"     " let g:ctrlp_user_command = 'rg --files %s'
+" endif
+
+" fzf.vim
+" populates quickfix window with selected lines
+function! s:build_quickfix_list(lines)
+  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+  copen
+  cc
+endfunction
+
+let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all' " select all lines
+
+let g:fzf_action = {
+  \ 'ctrl-q': function('s:build_quickfix_list'),
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-i': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+" per command history: use <C-P> and <C-N> to navigate through history
+let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+" rip grep
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
+  let initial_command = printf(command_fmt, shellescape(a:query))
+  let reload_command = printf(command_fmt, '{q}')
+  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+let g:fzf_buffers_jump = 1
+let g:fzf_layout = { 'down': '40%' }
+
 
 " --------------------- "
 " ------ OPTIONS ------ "
@@ -151,10 +186,10 @@ augroup END
 " --------------------- "
 
 syntax enable
-"for rust.vim
+" for rust.vim
 filetype plugin indent on
 set background=dark
-"colorscheme nnkd
+" colorscheme nnkd
 
 hi CursorLine        cterm=none ctermbg=8     ctermfg=none
 hi StatusLine        cterm=bold ctermbg=8 	  ctermfg=white
@@ -271,10 +306,10 @@ nnoremap <C-Right> <C-w><
 
 " quickfix and location lists
 " nnoremap <silent> <leader>q :copen<CR>
-nnoremap <silent> ]q :cnext<CR>
-nnoremap <silent> [q :cprevious<CR>
-nnoremap <silent> <M-j> :lnext<CR>
-nnoremap <silent> <M-k> :lprevious<CR>
+nnoremap <C-]> :cnext<CR>
+nnoremap <C-[> :cprevious<CR>
+" nnoremap <silent> <M-j> :lnext<CR>
+" nnoremap <silent> <M-k> :lprevious<CR>
 " nnoremap <silent> ]w :lnext<CR>
 " nnoremap <silent> [w :lprevious<CR>
 
@@ -312,4 +347,11 @@ nmap '' <Plug>(coc-diagnostic-next)
 " terminal
 nnoremap <silent> <C-t> :terminal ++close<CR>
 
-inoremap <C-[> <Esc>:w<Cr>
+" fzf.vim
+" CtrlP like
+nnoremap <silent> <C-P> :GFiles<CR>
+" fuzzy grep
+nnoremap <silent> <C-F> :RG<CR>
+
+" vim-togglelist
+nmap <script> <silent> <leader>q :call ToggleQuickfixList()<CR> 
