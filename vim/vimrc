@@ -178,7 +178,7 @@ set foldcolumn=0         " no foldcolumn at all
 " to disable foldcolumns
 augroup NoFold
     au!
-    au WinEnter,WinLeave * set nofen foldcolumn=0
+    au BufRead,WinEnter,WinLeave * set nofen foldcolumn=0
 augroup END
 
 " --------------------- "
@@ -352,6 +352,7 @@ nnoremap <silent> <C-t> :terminal ++close<CR>
 nnoremap <silent> <C-P> :GFiles<CR>
 " fuzzy grep
 nnoremap <silent> <C-F> :RG<CR>
+nnoremap <silent> <C-U> :Buffer<CR>
 
 " vim-togglelist
 nmap <script> <silent> <leader>q :call ToggleQuickfixList()<CR> 
