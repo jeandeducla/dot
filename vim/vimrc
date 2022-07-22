@@ -2,41 +2,18 @@
 " "PC Load Letter? What da fuck does that mean?"
 "
 
-" - [>] grep
-" - [.] tabs appearance
-" - [>] terminal
-" - [.] format
-"
-" - [.] SYNTAX highlight is bad
-" - [.] TRUE COLOR terminal?
-" - [.] theme
-"
 " As of 2022-06-01
 " - [.] SYNTAX highlight is bad
-" - [.] Ripgrep needs to be back
-" - [.] Fuzzy finder?
-" - [x] window resizing needs to be back
 " - [.] Some coc.vim tuning such as:
 "   - [.] Replacing in big projects, opens tabs for every file where there is
 "   a replace
 " - [.] Pimp fugitive
 "   - [x] goback in file history
-"   - [x] Gitblame
 "   - [.] some nicer shortcuts
-" - [.] Use Ripgrep for CtrlP
 
-
-" - [x] Use Ripgrep for CtrlP
-" - [.] fuzzy file finder
-" - [.] smaller police
 " - [.] better color scheme
 " - [.] better fugitive color scheme
-" - [x] CtrlP defaults to last visited files
-" - [.] switch buffers? maybe just with CtrlP
-" - [.] Line Number toggles
-" - [.] Git gutter and something to jumpt to next modification in file
 " - [.] git diff on file toggle
-" - [.] Nerdtree opens to current file
 " - [.] nicer coc.vim interface (no rounded borders)
 " - [.] coc.vim suggestion
 " - [.] coc.vim hover
@@ -53,7 +30,6 @@
 call plug#begin('~/.vim/plugged')
 
 Plug 'preservim/nerdtree'
-" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'cespare/vim-toml'
 Plug 'rust-lang/rust.vim'
@@ -61,9 +37,10 @@ Plug 'milkypostman/vim-togglelist'
 Plug 'leafgarland/typescript-vim'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'nathanaelkane/vim-indent-guides'
+Plug 'Yggdroot/indentLine'
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }                                                                                                                          
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'airblade/vim-gitgutter'
 call plug#end()
 
 " NERDTree
@@ -100,18 +77,6 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 let g:rustfmt_autosave = 1
 
 
-" ctrlp
-" let g:ctrlp_prompt_mappings = {
-"     \ 'AcceptSelection("h")': ['<c-i>'],
-"     \ }
-" let g:ctrlp_cmd = 'CtrlPBuffer'
-" if executable('rg') 
-"     let g:ctrlp_user_command = 'rg --files %s'
-"     " let g:ctrlp_user_cashing = 0
-"     " let g:ctrlp_user_command = 'rg --files %s'
-"     " let g:ctrlp_user_command = 'rg --files %s'
-" endif
-
 " fzf.vim
 " populates quickfix window with selected lines
 function! s:build_quickfix_list(lines)
@@ -145,6 +110,8 @@ command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 let g:fzf_buffers_jump = 1
 let g:fzf_layout = { 'down': '40%' }
 
+" git gutter
+let g:gitgutter_sign_removed = '-'
 
 " --------------------- "
 " ------ OPTIONS ------ "
@@ -195,6 +162,11 @@ hi CursorLine        cterm=none ctermbg=8     ctermfg=none
 hi StatusLine        cterm=bold ctermbg=8 	  ctermfg=white
 hi StatusLineNC      cterm=none ctermbg=8 	  ctermfg=0
 hi SignColumn        cterm=none ctermbg=none  ctermfg=none
+
+" line number
+hi LineNr       cterm=none ctermbg=none  ctermfg=black
+hi CursorLineNr cterm=bold ctermbg=8     ctermfg=214
+
 " vertical split color
 hi VertSplit         cterm=bold ctermbg=none  ctermfg=8 
 
@@ -203,15 +175,20 @@ hi Pmenu             cterm=none ctermbg=8     ctermfg=white
 hi PmenuSel          cterm=none ctermbg=white ctermfg=8
 
 " fugitive diff
-hi DiffAdd    cterm=none ctermfg=green ctermbg=none
-hi DiffDelete cterm=none ctermfg=red   ctermbg=none
-hi DiffChange cterm=none ctermfg=yellow ctermbg=none
-hi DiffText   cterm=none ctermfg=green ctermbg=none
+hi DiffAdd    cterm=none ctermfg=40 ctermbg=none
+hi DiffDelete cterm=none ctermfg=196   ctermbg=none
+hi DiffChange cterm=none ctermfg=220 ctermbg=none
+hi DiffText   cterm=none ctermfg=208 ctermbg=none
 
 " Git Status colors
 hi diffAdded   cterm=none ctermfg=40 ctermbg=none 
 hi diffRemoved cterm=none ctermfg=196 ctermbg=none
 hi diffChanged cterm=none ctermfg=208 ctermbg=none
+
+" Git Gutter Status colors
+hi GitGutterAdd    cterm=bold ctermfg=40 ctermbg=none 
+hi GitGutterDelete cterm=bold ctermfg=196 ctermbg=none
+hi GitGutterChange cterm=bold ctermfg=220 ctermbg=none
 
 " coc
 hi CocErrorSign        cterm=bold ctermbg=none ctermfg=red
@@ -244,6 +221,37 @@ autocmd Filetype json setlocal ts=2 sw=2 expandtab
 " --------------------- "
 " --- CUSTOM FUNCS ---- "
 " --------------------- "
+" toggles number locally and globally
+let g:Number = &l:number
+function GetNumber()
+    echom g:Number
+endfunction
+
+function SetLocalNumbers()
+    if &ft == "nerdtree"
+        set nonumber
+    else
+        let &l:number = g:Number
+    endif
+endfunction
+
+function ToggleLocalNumbers()
+    let g:Number = !g:Number
+    call SetLocalNumbers()
+endfunction
+
+function ToggleGlobalNumbers()
+    call ToggleLocalNumbers()
+    let originalw=winnr() " trick to come back to original window
+    windo call SetLocalNumbers()
+    exec originalw.'wincmd w'
+endfunction
+
+augroup Numbers
+    autocmd!
+    autocmd BufNewFile,BufRead * call SetLocalNumbers()
+augroup END
+
 
 " toggles wrap locally and globally
 let g:Wrap = &l:wrap
@@ -299,10 +307,10 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " window resizes
-nnoremap <C-Left>  <C-w>>
-nnoremap <C-Down>  <C-w>-
-nnoremap <C-Up>    <C-w>+
-nnoremap <C-Right> <C-w><
+nnoremap <C-Left>  <C-w><
+nnoremap <C-Down>  <C-w>+
+nnoremap <C-Up>    <C-w>_
+nnoremap <C-Right> <C-w>>
 
 " quickfix and location lists
 " nnoremap <silent> <leader>q :copen<CR>
@@ -321,11 +329,16 @@ nnoremap <silent> <S-h> :tabN<CR>
 nnoremap <silent> <leader>w :call ToggleLocalWrap()<CR>
 nnoremap <silent> <leader>W :call ToggleGlobalWrap()<CR>
 
+" global and local Numbers
+nnoremap <leader>n :call ToggleLocalNumbers()<CR>
+nnoremap <leader>N :call ToggleGlobalNumbers()<CR>
+
 " press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
 
 " NERDTree
 nnoremap <silent> <leader>ls :NERDTreeToggle<CR> <C-W>=<CR>
+nnoremap <silent> <leader>r :NERDTreeFind<CR>
 
 " fugitive
 nnoremap <leader>gd :Gvdiffsplit<CR>
