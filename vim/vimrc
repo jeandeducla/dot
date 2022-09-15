@@ -106,6 +106,7 @@ function! RipgrepFzf(query, fullscreen)
 endfunction
 
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+command! -nargs=* -bang RGUnderCursor call RipgrepFzf(expand('<cword>'), <bang>0)
 
 let g:fzf_buffers_jump = 1
 let g:fzf_layout = { 'down': '40%' }
@@ -131,7 +132,7 @@ set autoindent           " uses indentation of previous line
 set smartindent          " smart indention for C like language
 set tabstop=4            " tab width is 4 spaces
 set shiftwidth=4         " indent with 4 spaces
-set expandtab            " expand tab to spaces
+set noexpandtab          " does not expand tab to spaces
 set autoread             " automatically reads a file if it has been changed
 set completeopt-=preview " removes the preview window
 set timeoutlen=400       " most of my mapping are just 2 keys so you can type pretty fast
@@ -312,14 +313,10 @@ nnoremap <C-Down>  <C-w>+
 nnoremap <C-Up>    <C-w>_
 nnoremap <C-Right> <C-w>>
 
-" quickfix and location lists
-" nnoremap <silent> <leader>q :copen<CR>
-nnoremap <C-]> :cnext<CR>
-nnoremap <C-[> :cprevious<CR>
-" nnoremap <silent> <M-j> :lnext<CR>
-" nnoremap <silent> <M-k> :lprevious<CR>
-" nnoremap <silent> ]w :lnext<CR>
-" nnoremap <silent> [w :lprevious<CR>
+" location list
+" <leader>l to open location list
+nnoremap <C-]> :lnext<CR>
+nnoremap <C-[> :lprevious<CR>
 
 " tabs
 nnoremap <silent> <S-l> :tabn<CR>
@@ -330,8 +327,8 @@ nnoremap <silent> <leader>w :call ToggleLocalWrap()<CR>
 nnoremap <silent> <leader>W :call ToggleGlobalWrap()<CR>
 
 " global and local Numbers
-nnoremap <leader>n :call ToggleLocalNumbers()<CR>
-nnoremap <leader>N :call ToggleGlobalNumbers()<CR>
+nnoremap <silent> <leader>n :call ToggleLocalNumbers()<CR>
+nnoremap <silent> <leader>N :call ToggleGlobalNumbers()<CR>
 
 " press <space> <space> to turn off highlighting and clear any message already displayed.
 nnoremap <leader><space> :nohlsearch<Bar>:echo<CR>
@@ -342,7 +339,7 @@ nnoremap <silent> <leader>r :NERDTreeFind<CR>
 
 " fugitive
 nnoremap <leader>gd :Gvdiffsplit<CR>
-nnoremap <silent> <leader>gs :call ToggleLocalGitStatus()<CR>
+nnoremap <silent> <leader>g :call ToggleLocalGitStatus()<CR>
 nnoremap <leader>gst :tabnew<Bar>:call ToggleLocalGitStatus()<CR>
 nnoremap <leader>gl :Gpull<CR>
 nnoremap <leader>gp :Gpush<CR>
@@ -352,7 +349,7 @@ nnoremap <leader>gb :G blame<CR>
 nmap gd <Plug>(coc-definition)
 nmap gy <Plug>(coc-type-definition)
 nmap gi <Plug>(coc-implementation)
-nmap gr <Plug>(coc-references)
+nmap ff <Plug>(coc-references)
 nmap R <Plug>(coc-rename)
 nmap ;; <Plug>(coc-diagnostic-prev)
 nmap '' <Plug>(coc-diagnostic-next)
@@ -365,7 +362,9 @@ nnoremap <silent> <C-t> :terminal ++close<CR>
 nnoremap <silent> <C-P> :GFiles<CR>
 " fuzzy grep
 nnoremap <silent> <C-F> :RG<CR>
+nnoremap <silent> <S-F> :RGUnderCursor<CR>
 nnoremap <silent> <C-U> :Buffer<CR>
+nnoremap <silent> <C-G> :GFiles?<CR>
 
 " vim-togglelist
 nmap <script> <silent> <leader>q :call ToggleQuickfixList()<CR> 
